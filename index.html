@@ -62,7 +62,7 @@
                     📥 นำเข้าไฟล์รายชื่อ
                 </label>
                 <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-4 py-2.5 rounded-xl text-sm font-medium transition w-full md:w-auto">
-                    🔄 ดึงข้อมูลจากคลาวด์ล่าสุด
+                    🔄 ดึงข้อมูลจากคลาวด์
                 </button>
             </div>
         </div>
@@ -159,9 +159,8 @@
 
     <script>
         // ==========================================
-        // 🔴🔴🔴 นำลิงก์จาก GOOGLE SHEET มาวางตรงนี้! 🔴🔴🔴
+        // SCRIPT URL ของคุณครูเชื่อมต่อเรียบร้อยแล้ว
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6MXOQbfSQy9cqqG1RXMuD2F0HKoddn4fZNY-WM6KWb1izwRNhAV4IexGzlydV7sg/exec'; 
-        // ตัวอย่าง: const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
         // ==========================================
 
         let courses = JSON.parse(localStorage.getItem('sys_courses')) || [];
@@ -191,12 +190,10 @@
                 const response = await fetch(SCRIPT_URL);
                 const cloudData = await response.json();
                 
-                // เขียนทับ LocalStorage ด้วยข้อมูลจาก Cloud
                 for (let key in cloudData) {
                     localStorage.setItem(key, JSON.stringify(cloudData[key]));
                 }
                 
-                // โหลดข้อมูลเข้าสู่หน้าจอใหม่
                 courses = JSON.parse(localStorage.getItem('sys_courses')) || [];
                 currentCourseId = localStorage.getItem('sys_activeCourse') || (courses.length > 0 ? courses[0].id : null);
                 if (currentCourseId) localStorage.setItem('sys_activeCourse', currentCourseId);
@@ -211,7 +208,7 @@
         }
 
         function saveToCloud(key, data) {
-            if(!SCRIPT_URL) return; // ถ้าไม่มี URL ให้ข้ามการซิงค์
+            if(!SCRIPT_URL) return; 
             updateSyncUI('syncing');
             fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -240,7 +237,6 @@
         function initApp(checkCloudFirst = true) {
             document.getElementById('attendance-date').valueAsDate = new Date();
             
-            // โหลดครั้งแรก ดึงข้อมูลจากคลาวด์ก่อน (ถ้ามี URL)
             if (checkCloudFirst && SCRIPT_URL && courses.length === 0) {
                 forceSyncFromCloud();
                 return;
@@ -329,12 +325,13 @@
             }
         }
 
-        // --- ATTENDANCE ---
+        // --- ATTENDANCE (แก้ไขการบันทึกให้แม่นยำ) ---
         function loadAttendance() {
             const date = document.getElementById('attendance-date').value;
             const tbody = document.getElementById('attendance-list');
             tbody.innerHTML = '';
             if (students.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อในวิชานี้</td></tr>'; return; }
+            
             const dayRecord = attendanceData[date] || {};
             students.forEach(student => {
                 const status = dayRecord[student.id] || 'present';
@@ -350,20 +347,34 @@
                 tbody.appendChild(tr);
             });
         }
+        
         function createStatusBtn(sId, val, label, color, isActive) {
             const activeClass = isActive ? `bg-${color}-500 text-white shadow-md ring-2 ring-${color}-500/20` : `bg-slate-100 text-slate-400 hover:bg-slate-200`;
             return `<button onclick="setStatus('${sId}', '${val}')" class="${activeClass} px-4 py-1.5 rounded-full text-xs font-bold transition-all">${label}</button>`;
         }
+        
         function setStatus(sId, val) {
             const date = document.getElementById('attendance-date').value;
             if(!attendanceData[date]) attendanceData[date] = {};
             attendanceData[date][sId] = val;
             loadAttendance();
-            // ซิงค์การกดเข้าเรียนแบบทันที
             saveData('attendance', attendanceData); 
         }
+
         function saveAttendance() {
-            alert('ข้อมูลถูกบันทึกขึ้น Cloud แล้วครับ!');
+            const date = document.getElementById('attendance-date').value;
+            if (!date) { alert('กรุณาเลือกวันที่ก่อนบันทึก'); return; }
+            if (!attendanceData[date]) attendanceData[date] = {};
+            
+            // บังคับเขียน "มาเรียน" ให้ทุกคนที่ไม่ได้ระบุ เพื่อป้องกันรายชื่อหล่นหายตอนสรุปผล
+            students.forEach(student => {
+                if (!attendanceData[date][student.id]) {
+                    attendanceData[date][student.id] = 'present';
+                }
+            });
+            
+            saveData('attendance', attendanceData); 
+            alert('ข้อมูลเช็คชื่อถูกบันทึกสำเร็จ (ซิงค์ขึ้น Cloud เรียบร้อย)!');
         }
 
         // --- SCORES ---
@@ -411,7 +422,8 @@
             const theader = document.getElementById('report-table-header');
             tbody.innerHTML = '';
             const today = new Date(); today.setHours(0,0,0,0);
-            let filterDates = Object.keys(attendanceData);
+            
+            let filterDates = attendanceData ? Object.keys(attendanceData) : [];
             let reportTitle = "รายงานสรุปผลตลอดภาคเรียน";
 
             if (filterType === 'daily') {
@@ -438,17 +450,28 @@
             students.forEach(student => {
                 let sStats = { present: 0, absent: 0, late: 0 };
                 filterDates.forEach(date => {
-                    if (attendanceData[date] && attendanceData[date][student.id]) {
-                        const stat = attendanceData[date][student.id]; sStats[stat]++; overallStats[stat]++;
+                    if (attendanceData[date]) {
+                        const stat = attendanceData[date][student.id] || 'present'; 
+                        if (sStats[stat] !== undefined) {
+                            sStats[stat]++; 
+                            overallStats[stat]++;
+                        }
                     }
                 });
-                let rowHtml = `<tr><td class="p-4 pl-6"><div class="font-medium text-sm truncate">${student.name}</div><div class="text-xs text-slate-400">${student.id}</div></td><td class="p-4 text-center text-emerald-600 font-bold">${sStats.present}</td><td class="p-4 text-center text-rose-500 font-bold">${sStats.absent}</td><td class="p-4 text-center text-amber-500 font-bold">${sStats.late}</td>`;
+                
+                let rowHtml = `<tr><td class="p-4 pl-6">
+                    <div class="font-medium text-sm truncate student-name-col">${student.name}</div>
+                    <div class="text-xs text-slate-400 student-id-col">${student.id}</div>
+                    </td><td class="p-4 text-center text-emerald-600 font-bold">${sStats.present}</td><td class="p-4 text-center text-rose-500 font-bold">${sStats.absent}</td><td class="p-4 text-center text-amber-500 font-bold">${sStats.late}</td>`;
+                
                 let totalScore = 0;
                 tasks.forEach(task => {
                     let sc = (scores[student.id] && scores[student.id][task.id]) !== undefined ? scores[student.id][task.id] : '';
                     if(sc !== '') totalScore += parseFloat(sc);
                     rowHtml += `<td class="p-4 text-center border-l border-slate-100 text-sm">${sc === '' ? '-' : sc}</td>`;
                 });
+                
+                totalScore = Math.round(totalScore * 100) / 100;
                 rowHtml += `<td class="p-4 text-right pr-6 font-bold text-lg text-indigo-600 border-l border-slate-100">${totalScore}</td></tr>`;
                 tbody.innerHTML += rowHtml;
             });
@@ -461,23 +484,30 @@
         }
 
         function exportToPDF() {
-            const courseName = courses.find(c => c.id === currentCourseId)?.name || '';
+            if (students.length === 0) { alert("ไม่มีข้อมูลสำหรับ Export"); return; }
+            const courseName = courses.find(c => c.id === currentCourseId)?.name || 'ไม่ระบุวิชา';
+            const reportTitle = document.getElementById('report-title-display').textContent;
             const pdfContainer = document.createElement('div');
             pdfContainer.style.padding = '30px'; pdfContainer.style.fontFamily = "'Kanit', sans-serif";
-            let htmlContent = `<h2 style="text-align: center;">รายงานสรุป ${courseName}</h2><table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;"><thead><tr style="background-color: #f3f4f6;"><th style="border: 1px solid #d1d5db; padding: 6px;">รหัส</th><th style="border: 1px solid #d1d5db; padding: 6px;">ชื่อ</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">มา</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">ขาด</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">สาย</th>`;
+            
+            let htmlContent = `<h2 style="text-align: center;">${reportTitle}</h2><p style="text-align: center; margin-bottom: 20px;">รายวิชา: <strong>${courseName}</strong></p><table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;"><thead><tr style="background-color: #f3f4f6;"><th style="border: 1px solid #d1d5db; padding: 6px;">รหัส</th><th style="border: 1px solid #d1d5db; padding: 6px;">ชื่อ</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">มา</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">ขาด</th><th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">สาย</th>`;
             tasks.forEach(task => { htmlContent += `<th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${task.name}</th>`; });
             htmlContent += `<th style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">รวม</th></tr></thead><tbody>`;
+            
             const trElements = document.getElementById('report-list').children;
             for(let tr of trElements) {
                 if(tr.children.length > 1) {
-                    const tds = tr.children; const nameCell = tds[0].innerText.split('\n');
-                    let rowHtml = `<tr><td style="border: 1px solid #d1d5db; padding: 6px;">${nameCell[1]||''}</td><td style="border: 1px solid #d1d5db; padding: 6px;">${nameCell[0]}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[1].innerText}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[2].innerText}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[3].innerText}</td>`;
+                    const tds = tr.children; 
+                    const stName = tds[0].querySelector('.student-name-col')?.innerText || '';
+                    const stId = tds[0].querySelector('.student-id-col')?.innerText || '';
+
+                    let rowHtml = `<tr><td style="border: 1px solid #d1d5db; padding: 6px;">${stId}</td><td style="border: 1px solid #d1d5db; padding: 6px;">${stName}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[1].innerText}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[2].innerText}</td><td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[3].innerText}</td>`;
                     for(let i=0; i<tasks.length; i++) rowHtml += `<td style="border: 1px solid #d1d5db; padding: 6px; text-align: center;">${tds[4+i].innerText}</td>`;
                     rowHtml += `<td style="border: 1px solid #d1d5db; padding: 6px; text-align: center; font-weight: bold;">${tds[4+tasks.length].innerText}</td></tr>`;
                     htmlContent += rowHtml;
                 }
             }
-            htmlContent += `</tbody></table>`;
+            htmlContent += `</tbody></table><div style="text-align: right; margin-top: 10px; font-size: 10px;">พิมพ์จากระบบ ClassroomOS Cloud Edition</div>`;
             pdfContainer.innerHTML = htmlContent;
             html2pdf().set({ margin: 0.5, filename: `รายงาน_${courseName}.pdf`, jsPDF: { orientation: 'landscape' } }).from(pdfContainer).save();
         }
