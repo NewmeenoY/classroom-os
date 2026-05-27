@@ -25,16 +25,17 @@
 
     <div id="toast" class="fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none z-[100] transform translate-y-4 font-medium"></div>
 
-    <div class="bg-slate-900 text-white px-6 py-2 text-sm flex justify-between items-center z-50 relative">
-        <div class="flex items-center space-x-3">
+    <div class="bg-slate-900 text-white px-6 py-2 text-sm flex justify-between items-center z-50 relative overflow-x-auto">
+        <div class="flex items-center space-x-3 whitespace-nowrap">
             <span class="text-slate-400 hidden md:inline">รายวิชา/กิจกรรม:</span>
             <select id="course-selector" onchange="changeCourse()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg p-1.5 outline-none font-semibold min-w-[150px]"></select>
         </div>
-        <div class="flex items-center space-x-4">
-            <div id="sync-status" class="text-xs font-medium text-emerald-400 flex items-center gap-1">☁️ พร้อมใช้งาน</div>
-            <div class="border-l border-slate-700 pl-4 space-x-2">
+        <div class="flex items-center space-x-4 whitespace-nowrap ml-4">
+            <div id="sync-status" class="text-xs font-medium text-emerald-400 flex items-center gap-1 hidden sm:flex">☁️ พร้อมใช้งาน</div>
+            <div class="border-l border-slate-700 pl-4 space-x-2 flex items-center">
                 <button onclick="createNewCourse()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-md font-medium transition text-xs">+ สร้างใหม่</button>
-                <button onclick="emergencyReset()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs">🛠 ล้างระบบแก้ค้าง</button>
+                <button onclick="editCourseName()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 rounded-md font-medium transition text-xs">✏️ แก้ไขชื่อ</button>
+                <button onclick="emergencyReset()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs">🛠 ล้างระบบ</button>
             </div>
         </div>
     </div>
@@ -76,7 +77,7 @@
                     <div>
                         <h3 class="font-semibold text-lg text-slate-900 flex items-center gap-2">
                             บันทึกการเข้าเรียน
-                            <button onclick="markAllPresent()" class="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1 rounded-full font-medium transition border border-emerald-200">✅ ติ๊กมาทุกคน</button>
+                            <button onclick="markAllPresent()" class="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1 rounded-full font-medium transition border border-emerald-200 shadow-sm">✅ ติ๊กมาทุกคน</button>
                         </h3>
                         <input type="date" id="attendance-date" onchange="loadAttendance()" class="mt-2 border border-slate-200 rounded-xl px-4 py-2 outline-none text-slate-700">
                     </div>
@@ -104,7 +105,7 @@
                         <h3 class="font-semibold text-lg text-slate-900">บันทึกคะแนนรายชิ้นงาน</h3>
                         <p class="text-xs text-slate-500">* ระบบจะเซฟคะแนนให้อัตโนมัติเมื่อพิมพ์ตัวเลขเสร็จ</p>
                     </div>
-                    <button onclick="addNewTask()" class="bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    <button onclick="addNewTask()" class="bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
                         ➕ เพิ่มชิ้นงาน/ช่องคะแนน
                     </button>
                 </div>
@@ -205,9 +206,9 @@
 
         function updateSyncUI(status) {
             const ui = document.getElementById('sync-status');
-            if(status === 'syncing') { ui.innerHTML = `<span class="spin inline-block">⏳</span> กำลังซิงค์...`; ui.className = "text-xs font-medium text-amber-400 flex items-center gap-1"; }
-            else if(status === 'success') { ui.innerHTML = `☁️ ซิงค์แล้ว`; ui.className = "text-xs font-medium text-emerald-400 flex items-center gap-1"; }
-            else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 flex items-center gap-1"; }
+            if(status === 'syncing') { ui.innerHTML = `<span class="spin inline-block">⏳</span> กำลังซิงค์...`; ui.className = "text-xs font-medium text-amber-400 flex items-center gap-1 hidden sm:flex"; }
+            else if(status === 'success') { ui.innerHTML = `☁️ ซิงค์แล้ว`; ui.className = "text-xs font-medium text-emerald-400 flex items-center gap-1 hidden sm:flex"; }
+            else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 flex items-center gap-1 hidden sm:flex"; }
         }
 
         async function forceSyncFromCloud() {
@@ -282,6 +283,22 @@
                 localStorage.setItem('sys_activeCourse', currentCourseId);
                 initApp(false);
                 showToast(`สร้างวิชา ${name} สำเร็จ!`);
+            }
+        }
+
+        // 🌟 ฟังก์ชันใหม่: แก้ไขชื่อวิชา
+        function editCourseName() {
+            if (!currentCourseId || courses.length === 0) return showToast("ไม่มีรายวิชาให้แก้ไข", true);
+            const courseIndex = courses.findIndex(c => c.id === currentCourseId);
+            if (courseIndex > -1) {
+                const currentName = courses[courseIndex].name;
+                const newName = prompt("แก้ไขชื่อห้อง/รายวิชา:", currentName);
+                if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
+                    courses[courseIndex].name = newName.trim();
+                    saveGlobalData('sys_courses', courses);
+                    updateCourseDropdown();
+                    showToast(`เปลี่ยนชื่อวิชาเป็น "${newName.trim()}" สำเร็จ!`);
+                }
             }
         }
 
@@ -374,14 +391,13 @@
             saveData('remarks', remarksData);
         }
 
-        // ฟังก์ชันใหม่: ติ๊กมาทุกคน
         function markAllPresent() {
             const date = document.getElementById('attendance-date').value;
             if (!date) return;
             if (!attendanceData[date]) attendanceData[date] = {};
             let count = 0;
             students.forEach(s => {
-                if (!attendanceData[date][s.id]) { // เปลี่ยนเฉพาะคนที่ยังไม่ได้เช็ค
+                if (!attendanceData[date][s.id]) { 
                     attendanceData[date][s.id] = 'present';
                     count++;
                 }
@@ -410,7 +426,7 @@
             showToast('💾 บันทึกเช็คชื่อขึ้น Cloud สำเร็จ!');
         }
 
-        // --- SCORES (ดึงกลับมาครบ 100%) ---
+        // --- SCORES ---
         function addNewTask() {
             const taskName = prompt("ชื่อชิ้นงาน/ช่องคะแนน:"); if (!taskName) return;
             const maxScore = prompt("คะแนนเต็ม?:", "10"); if (!maxScore || isNaN(maxScore)) return;
@@ -445,7 +461,7 @@
             if (!scores[studentId]) scores[studentId] = {};
             let numValue = value === '' ? '' : parseFloat(value);
             scores[studentId][taskId] = numValue; saveData('scores', scores);
-            showToast('✅ เซฟคะแนนแล้ว'); // แจ้งเตือนเวลาพิมพ์คะแนนเสร็จ
+            showToast('✅ เซฟคะแนนแล้ว'); 
         }
 
         // --- REPORTS ---
@@ -527,19 +543,16 @@
                 <div class="bg-purple-50 p-4 rounded-2xl shadow-sm border border-purple-100"><p class="text-purple-600 text-xs font-bold">ลาสะสม</p><p class="text-2xl font-bold text-purple-700">${overall.leave}</p></div>`;
         }
 
-        // ฟังก์ชันใหม่: โหลดเป็นไฟล์ Excel
         function exportToExcel() {
             if (students.length === 0) return showToast("ไม่มีข้อมูลสำหรับ Export", true);
             const courseName = courses.find(c => c.id === currentCourseId)?.name || 'Report';
             
-            // ดึงข้อมูลจากตาราง HTML มาทำเป็น Excel เลย
             let table = document.getElementById('report-table');
             let wb = XLSX.utils.table_to_book(table, {sheet:"ClassroomOS Report"});
             XLSX.writeFile(wb, `รายงาน_${courseName}.xlsx`);
             showToast('✅ ดาวน์โหลด Excel สำเร็จ!');
         }
 
-        // โหลดเป็นไฟล์ PDF
         function exportToPDF() {
             if (students.length === 0) return showToast("ไม่มีข้อมูลสำหรับ Export", true);
             const courseName = courses.find(c => c.id === currentCourseId)?.name || '';
@@ -565,7 +578,6 @@
             html2pdf().set({ margin: 0.5, filename: `รายงาน_${courseName}.pdf`, jsPDF: { orientation: 'landscape' } }).from(pdfContainer).save().then(() => showToast('✅ ดาวน์โหลด PDF สำเร็จ!'));
         }
 
-        // นำเข้าไฟล์
         async function importData(event) {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true); const file = event.target.files[0]; if (!file) return;
             showToast('⏳ กำลังอ่านไฟล์...');
