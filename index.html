@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassroomOS Pro - Full Edition with AI OCR</title>
+    <title>ClassroomOS Pro - AI Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -52,7 +52,7 @@
             <div class="border-l border-slate-700 pl-4 space-x-2 flex items-center">
                 <button onclick="createNewCourse()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">+ สร้างใหม่</button>
                 <button onclick="editCourseName()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">✏️ แก้ไขชื่อ</button>
-                <button onclick="localStorage.clear(); window.location.reload();" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">🛠 ล้างบั๊ก</button>
+                <button onclick="if(confirm('ล้างข้อมูลฉุกเฉิน?')) { localStorage.clear(); window.location.reload(); }" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">🛠 ล้างบั๊ก</button>
             </div>
         </div>
     </div>
@@ -79,7 +79,11 @@
             </div>
             <div class="flex flex-wrap gap-2 w-full lg:w-auto">
                 <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                    ➕ เพิ่มเอง
+                    ➕ เพิ่มรายชื่อ
+                </button>
+                
+                <button onclick="sortStudents()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
+                    🔀 เรียงตามรหัส
                 </button>
                 
                 <input type="file" id="import-image" accept="image/*" class="hidden" onchange="importFromImage(event)">
@@ -93,11 +97,7 @@
                 </label>
                 
                 <button onclick="deleteAllStudents()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                    🗑️ ล้างชื่อทั้งหมด
-                </button>
-                
-                <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-2 rounded-xl text-sm font-medium transition flex-1 sm:flex-none">
-                    🔄 ดึงข้อมูล
+                    🗑️ ล้างทั้งหมด
                 </button>
             </div>
         </div>
@@ -376,7 +376,24 @@
             if(tabId === 'report-tab') generateReport();
         }
 
-        // --- เพิ่ม / แก้ไข / ลบ รายชื่อ ---
+        function sortStudents() {
+            if (!students || students.length === 0) return showToast("ไม่มีรายชื่อให้จัดเรียง", true);
+            students.sort((a, b) => {
+                let numA = String(a.id).replace(/\D/g, ''); let numB = String(b.id).replace(/\D/g, '');
+                if (numA && numB) {
+                    if (numA.length !== numB.length) return numA.length - numB.length;
+                    return numA.localeCompare(numB);
+                }
+                return String(a.id).localeCompare(String(b.id), 'th');
+            });
+            saveData('students', students);
+            if(!document.getElementById('attendance-tab').classList.contains('hidden')) loadAttendance();
+            if(!document.getElementById('score-tab').classList.contains('hidden')) renderScoreTable();
+            if(!document.getElementById('report-tab').classList.contains('hidden')) generateReport();
+            showToast("🔀 จัดเรียงรหัสสำเร็จแล้ว!");
+        }
+
+        // --- เพิ่ม / 🌟 แก้ไขอัจฉริยะ (รหัส+ชื่อ) 🌟 / ลบ ---
         function addStudentManual() {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
             const newId = prompt("ใส่ 'รหัสประจำตัว' (เช่น 680001):");
@@ -387,18 +404,73 @@
             if (!newName || newName.trim() === "") return;
 
             students.push({ id: newId.trim(), name: newName.trim() });
-            students.sort((a,b) => a.id.localeCompare(b.id)); 
             saveData('students', students); loadAttendance(); showToast(`เพิ่มรายชื่อ ${newName.trim()} สำเร็จ!`);
         }
 
-        function editStudent(id) {
-            const student = students.find(s => s.id === id);
-            if (student) {
-                const newName = prompt(`แก้ไขชื่อของ ${id}:`, student.name);
-                if (newName && newName.trim() !== "") { 
-                    student.name = newName.trim(); saveData('students', students); loadAttendance(); showToast('แก้ไขชื่อสำเร็จ');
-                }
+        // 🌟 ฟังก์ชันใหม่: แก้ไขได้ทั้ง รหัส และ ชื่อ
+        function editStudentData(oldId) {
+            const student = students.find(s => s.id === oldId);
+            if (!student) return;
+
+            // 1. ถามรหัสใหม่
+            const newIdInput = prompt(`✏️ แก้ไข "รหัสประจำตัว"\n(เดิม: ${oldId})`, oldId);
+            if (newIdInput === null) return; // กดยกเลิก
+            const newId = newIdInput.trim();
+
+            if (newId === "") return showToast("รหัสประจำตัวห้ามว่าง!", true);
+            
+            // เช็ครหัสซ้ำ (ในกรณีที่เปลี่ยนไปใช้รหัสคนอื่น)
+            if (newId !== oldId && students.find(s => s.id === newId)) {
+                return showToast("รหัสนี้มีซ้ำอยู่ในระบบแล้ว!", true);
             }
+
+            // 2. ถามชื่อใหม่
+            const newNameInput = prompt(`✏️ แก้ไข "ชื่อ-นามสกุล"\n(เดิม: ${student.name})`, student.name);
+            if (newNameInput === null) return; // กดยกเลิก
+            const newName = newNameInput.trim();
+            
+            if (newName === "") return showToast("ชื่อห้ามว่าง!", true);
+
+            // 3. ทำการอัปเดตข้อมูล
+            student.id = newId;
+            student.name = newName;
+
+            // 4. ถ้ารหัสเปลี่ยน ต้องโอนย้ายฐานข้อมูล (คะแนน, เช็คชื่อ, หมายเหตุ) ไปรหัสใหม่ด้วย!
+            if (newId !== oldId) {
+                // โอนย้ายการเช็คชื่อ
+                for (let date in attendanceData) {
+                    if (attendanceData[date][oldId] !== undefined) {
+                        attendanceData[date][newId] = attendanceData[date][oldId];
+                        delete attendanceData[date][oldId];
+                    }
+                }
+                saveData('attendance', attendanceData);
+
+                // โอนย้ายคะแนน
+                if (scores[oldId] !== undefined) {
+                    scores[newId] = scores[oldId];
+                    delete scores[oldId];
+                }
+                saveData('scores', scores);
+
+                // โอนย้ายหมายเหตุ
+                for (let date in remarksData) {
+                    if (remarksData[date][oldId] !== undefined) {
+                        remarksData[date][newId] = remarksData[date][oldId];
+                        delete remarksData[date][oldId];
+                    }
+                }
+                saveData('remarks', remarksData);
+            }
+
+            saveData('students', students); 
+            
+            // อัปเดตหน้าจอ
+            if(!document.getElementById('attendance-tab').classList.contains('hidden')) loadAttendance();
+            if(!document.getElementById('score-tab').classList.contains('hidden')) renderScoreTable();
+            if(!document.getElementById('report-tab').classList.contains('hidden')) generateReport();
+            
+            showToast('บันทึกข้อมูลแก้ไขสำเร็จ!');
         }
 
         function deleteStudent(id) {
@@ -410,28 +482,15 @@
             }
         }
 
-        // 🌟 ฟังก์ชันใหม่: ล้างรายชื่อทั้งหมด 🌟
         function deleteAllStudents() {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
             if(students.length === 0) return showToast("ยังไม่มีรายชื่อให้ลบ", true);
             
             const msg = "⚠️ คำเตือน: คุณต้องการ 'ลบรายชื่อนักเรียนทั้งหมด' ในวิชานี้ใช่หรือไม่?\n\n(ข้อมูลการเช็คชื่อ, คะแนน และหมายเหตุ จะถูกลบไปด้วย แต่ช่องเก็บคะแนนจะยังคงอยู่)";
             if(confirm(msg)) {
-                students = [];
-                attendanceData = {};
-                scores = {};
-                remarksData = {};
-                
-                saveData('students', students);
-                saveData('attendance', attendanceData);
-                saveData('scores', scores);
-                saveData('remarks', remarksData);
-                
-                loadAttendance();
-                renderScoreTable();
-                generateReport();
-                
-                showToast(`🗑️ ล้างรายชื่อและข้อมูลทั้งหมดสำเร็จ!`);
+                students = []; attendanceData = {}; scores = {}; remarksData = {};
+                saveData('students', students); saveData('attendance', attendanceData); saveData('scores', scores); saveData('remarks', remarksData);
+                loadDataForCurrentCourse(); showToast(`🗑️ ล้างรายชื่อและข้อมูลทั้งหมดสำเร็จ!`);
             }
         }
 
@@ -455,7 +514,7 @@
                         <div class="flex items-center gap-2 group">
                             <span class="truncate max-w-[120px] md:max-w-none">${student.name}</span>
                             <div class="opacity-0 group-hover:opacity-100 transition flex gap-1">
-                                <button onclick="editStudent('${student.id}')" class="text-slate-500 hover:text-indigo-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="แก้ไขชื่อ">✏️</button>
+                                <button onclick="editStudentData('${student.id}')" class="text-slate-500 hover:text-indigo-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="แก้ไขรหัส/ชื่อ">✏️</button>
                                 <button onclick="deleteStudent('${student.id}')" class="text-slate-500 hover:text-rose-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="ลบรายชื่อ">🗑️</button>
                             </div>
                         </div>
@@ -479,15 +538,13 @@
         function setStatus(sId, val) {
             const date = document.getElementById('attendance-date').value;
             if(!attendanceData[date]) attendanceData[date] = {};
-            attendanceData[date][sId] = val;
-            loadAttendance(); 
+            attendanceData[date][sId] = val; loadAttendance(); 
         }
 
         function setRemark(sId, val) {
             const date = document.getElementById('attendance-date').value;
             if(!remarksData[date]) remarksData[date] = {};
-            remarksData[date][sId] = val;
-            saveData('remarks', remarksData);
+            remarksData[date][sId] = val; saveData('remarks', remarksData);
         }
 
         function markAllPresent() {
@@ -693,20 +750,18 @@
                     const uMap = new Map();
                     students.forEach(s => uMap.set(s.id, s)); 
                     parsedStudents.forEach(s => uMap.set(s.id, s)); 
-                    students = Array.from(uMap.values()).sort((a,b) => a.id.localeCompare(b.id));
-
+                    students = Array.from(uMap.values());
+                    
                     saveData('students', students); 
                     loadAttendance(); 
-                    showToast(`✅ สแกนรูปภาพสำเร็จ! เพิ่มรายชื่อ ${parsedStudents.length} คน`);
+                    showToast(`✅ สแกนสำเร็จ ${parsedStudents.length} คน (กด 'เรียงตามรหัส' หากต้องการ)`);
                 } else {
-                    showToast("❌ ไม่พบรหัสและชื่อที่เข้าคู่กัน (แนะนำให้ครอปเฉพาะช่วงรายชื่อให้ชัดเจน)", true);
+                    showToast("❌ ไม่พบข้อมูลรายชื่อ (แนะนำให้ครอปให้เห็นรหัสกับชื่อชัดๆ)", true);
                 }
             } catch (error) {
-                console.error(error);
-                showToast("เกิดข้อผิดพลาดในการอ่านรูปภาพ", true);
+                console.error(error); showToast("เกิดข้อผิดพลาดในการอ่านรูปภาพ", true);
             } finally {
-                hideLoader();
-                event.target.value = '';
+                hideLoader(); event.target.value = '';
             }
         }
 
@@ -738,8 +793,8 @@
                         while ((m = fallbackRegex.exec(fullTextStream)) !== null) { let cleanName = m[2].replace(/\s+/g, ' ').trim(); if(cleanName.length > 4) parsedStudents.push({ id: m[1], name: cleanName }); }
                     }
                     if (parsedStudents.length > 0) {
-                        const uMap = new Map(); parsedStudents.forEach(s => uMap.set(s.id, s)); students = Array.from(uMap.values()).sort((a,b) => a.id.localeCompare(b.id));
-                        saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า PDF สำเร็จ ${students.length} คน`);
+                        const uMap = new Map(); parsedStudents.forEach(s => uMap.set(s.id, s)); students = Array.from(uMap.values());
+                        saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า PDF สำเร็จ ${students.length} คน (กด 'เรียงตามรหัส' หากต้องการ)`);
                     } else { showToast("อ่าน PDF ไม่สำเร็จ แนะนำให้ใช้ Excel/ภาพ", true); }
                 } catch (e) { showToast("เกิดข้อผิดพลาดในการอ่าน PDF", true); }
                 finally { hideLoader(); }
@@ -751,7 +806,11 @@
                         let idK = Object.keys(row).find(k => k.toLowerCase().includes('id') || k.includes('รหัส')); let nmK = Object.keys(row).find(k => k.toLowerCase().includes('name') || k.includes('ชื่อ'));
                         if(idK && nmK && row[idK] && row[nmK]) fmt.push({ id: String(row[idK]).trim(), name: String(row[nmK]).trim() });
                     });
-                    if (fmt.length > 0) { students = fmt; saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า Excel สำเร็จ ${students.length} คน`); }
+                    if (fmt.length > 0) { 
+                        const uMap = new Map(); students.forEach(s => uMap.set(s.id, s)); fmt.forEach(s => uMap.set(s.id, s));
+                        students = Array.from(uMap.values());
+                        saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า Excel สำเร็จ ${students.length} คน`); 
+                    }
                     hideLoader();
                 }; reader.readAsBinaryString(file);
             } event.target.value = '';
