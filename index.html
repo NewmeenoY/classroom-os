@@ -75,24 +75,28 @@
         <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
                 <h2 class="text-lg font-semibold text-slate-900">จัดการรายชื่อ <span class="text-indigo-600" id="display-course-name"></span></h2>
-                <p class="text-slate-500 text-sm">เพิ่มเอง, นำเข้า Excel หรือใช้ AI สแกนจากรูปภาพ</p>
+                <p class="text-slate-500 text-sm">เพิ่มเอง, นำเข้าไฟล์ หรือสแกนจากรูปภาพ</p>
             </div>
             <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-                <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
                     ➕ เพิ่มเอง
                 </button>
                 
                 <input type="file" id="import-image" accept="image/*" class="hidden" onchange="importFromImage(event)">
-                <label for="import-image" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                <label for="import-image" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
                     📸 สแกนรูปภาพ
                 </label>
 
                 <input type="file" id="import-file" accept=".csv, .xlsx, .xls, .pdf" class="hidden" onchange="importData(event)">
-                <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
                     📥 นำเข้าไฟล์
                 </label>
                 
-                <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-4 py-2.5 rounded-xl text-sm font-medium transition flex-1 sm:flex-none">
+                <button onclick="deleteAllStudents()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
+                    🗑️ ล้างชื่อทั้งหมด
+                </button>
+                
+                <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-2 rounded-xl text-sm font-medium transition flex-1 sm:flex-none">
                     🔄 ดึงข้อมูล
                 </button>
             </div>
@@ -406,6 +410,31 @@
             }
         }
 
+        // 🌟 ฟังก์ชันใหม่: ล้างรายชื่อทั้งหมด 🌟
+        function deleteAllStudents() {
+            if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
+            if(students.length === 0) return showToast("ยังไม่มีรายชื่อให้ลบ", true);
+            
+            const msg = "⚠️ คำเตือน: คุณต้องการ 'ลบรายชื่อนักเรียนทั้งหมด' ในวิชานี้ใช่หรือไม่?\n\n(ข้อมูลการเช็คชื่อ, คะแนน และหมายเหตุ จะถูกลบไปด้วย แต่ช่องเก็บคะแนนจะยังคงอยู่)";
+            if(confirm(msg)) {
+                students = [];
+                attendanceData = {};
+                scores = {};
+                remarksData = {};
+                
+                saveData('students', students);
+                saveData('attendance', attendanceData);
+                saveData('scores', scores);
+                saveData('remarks', remarksData);
+                
+                loadAttendance();
+                renderScoreTable();
+                generateReport();
+                
+                showToast(`🗑️ ล้างรายชื่อและข้อมูลทั้งหมดสำเร็จ!`);
+            }
+        }
+
         // --- ระบบเช็คชื่อ ---
         function loadAttendance() {
             const date = document.getElementById('attendance-date').value;
@@ -551,10 +580,11 @@
                 filterDates = allDates.filter(d => new Date(d).getMonth() === today.getMonth() && new Date(d).getFullYear() === today.getFullYear());
                 reportTitle = `รายงานสรุปรายเดือน (${today.toLocaleDateString('th-TH', {month: 'long', year: 'numeric'})})`;
             }
+            
             document.getElementById('report-title-display').textContent = reportTitle;
 
             let headerHtml = `<tr><th class="p-4 pl-6 w-64">ชื่อ-นามสกุล</th><th class="p-4 text-center">มา</th><th class="p-4 text-center">ขาด</th><th class="p-4 text-center">สาย</th><th class="p-4 text-center text-purple-600">ลา</th>`;
-            tasks.forEach(t => { headerHtml += `<th class="p-4 text-center border-l text-[10px] min-w-[80px]">${t.name}</th>`; });
+            tasks.forEach(t => { headerHtml += `<th class="p-4 text-center border-l text-[10px] min-w-[80px]">${t.name}<br>(${t.maxScore})</th>`; });
             headerHtml += `<th class="p-4 text-right pr-6 border-l text-indigo-600">คะแนนรวม</th><th class="p-4 text-left border-l">หมายเหตุ</th></tr>`;
             theader.innerHTML = headerHtml;
 
@@ -632,7 +662,7 @@
             html2pdf().set({ margin: 0.5, filename: `รายงาน_${courseName}.pdf`, jsPDF: { orientation: 'landscape' } }).from(pdfContainer).save().then(() => showToast('✅ ดาวน์โหลด PDF สำเร็จ!'));
         }
 
-        // 🌟 🤖 ฟังก์ชันใหม่: AI สแกนข้อความจากรูปภาพ (OCR) 🤖 🌟
+        // 🤖 AI OCR
         async function importFromImage(event) {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
             const file = event.target.files[0];
@@ -641,24 +671,18 @@
             showLoader("กำลังประมวลผลรูปภาพด้วย AI", "ระบบกำลังอ่านรายชื่อ อาจใช้เวลาสักครู่ ห้ามปิดหน้าต่างนี้", "📸", true);
 
             try {
-                // เรียกใช้ Tesseract.js (ภาษาไทย + อังกฤษ)
                 const result = await Tesseract.recognize(file, 'tha+eng');
                 const lines = result.data.text.split('\n');
                 let parsedStudents = [];
 
                 lines.forEach(line => {
-                    // มองหารหัสประจำตัว 10-13 หลัก (ปรับได้ตามมาตรฐานของวิทยาลัย)
                     const idMatch = line.match(/\b\d{10,13}\b/);
                     if (idMatch) {
                         const sId = idMatch[0];
-                        // ตัดสตริงตั้งแต่รหัสเป็นต้นไป แล้วค่อยสกัดชื่อ
                         let name = line.substring(line.indexOf(sId) + sId.length);
-                        // ลบอักขระขยะด้านหน้าและด้านหลัง
                         name = name.replace(/^[^\u0E00-\u0E7Fa-zA-Z]+/, '').trim();
-                        // เอาตัวเลข, เครื่องหมายวรรคตอนที่ผิดปกติออก แต่เก็บช่องว่างระหว่างชื่อกับนามสกุลไว้
                         name = name.replace(/[\d\.\,\-_]/g, "").replace(/\s{2,}/g, " ").trim();
                         
-                        // ป้องกันรายชื่อสั้นเกินไปหรือขยะ
                         if (name.length > 4) {
                             parsedStudents.push({ id: sId, name: name });
                         }
@@ -667,8 +691,8 @@
 
                 if (parsedStudents.length > 0) {
                     const uMap = new Map();
-                    students.forEach(s => uMap.set(s.id, s)); // ของเดิม
-                    parsedStudents.forEach(s => uMap.set(s.id, s)); // ของใหม่จากรูป
+                    students.forEach(s => uMap.set(s.id, s)); 
+                    parsedStudents.forEach(s => uMap.set(s.id, s)); 
                     students = Array.from(uMap.values()).sort((a,b) => a.id.localeCompare(b.id));
 
                     saveData('students', students); 
