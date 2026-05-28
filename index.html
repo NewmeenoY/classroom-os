@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassroomOS Pro - Full Edition</title>
+    <title>ClassroomOS Pro - Full Edition with AI OCR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     
     <style>
         body { font-family: 'Kanit', sans-serif; }
@@ -20,10 +21,26 @@
         /* Toast Animation */
         #toast { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
     </style>
+
+    <script>
+        window.onerror = function(message, source, lineno) {
+            document.body.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background-color:#f8fafc; font-family:'Kanit', sans-serif; text-align:center; padding:20px;">
+                    <div style="font-size: 50px; margin-bottom: 20px;">⚠️</div>
+                    <h1 style="color:#e11d48; font-size:24px; font-weight:bold; margin-bottom:10px;">ระบบขัดข้อง</h1>
+                    <p style="color:#64748b; margin-bottom:30px; font-size:14px;">กรุณากดปุ่มด้านล่างเพื่อล้างข้อมูลที่ค้างอยู่ (ข้อมูลบน Google Sheets จะไม่หาย)</p>
+                    <button onclick="localStorage.clear(); window.location.reload();" style="background-color:#e11d48; color:white; padding:12px 24px; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">
+                        🛠 กดที่นี่เพื่อซ่อมแซมระบบ
+                    </button>
+                </div>
+            `;
+            return true;
+        };
+    </script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
 
-    <div id="toast" class="fixed bottom-5 right-5 px-4 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none z-[100] transform translate-y-4 font-medium"></div>
+    <div id="toast" class="fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none z-[100] transform translate-y-4 font-medium text-white"></div>
 
     <div class="bg-slate-900 text-white px-6 py-2 text-sm flex justify-between items-center z-50 relative overflow-x-auto">
         <div class="flex items-center space-x-3 whitespace-nowrap">
@@ -33,9 +50,9 @@
         <div class="flex items-center space-x-4 whitespace-nowrap ml-4">
             <div id="sync-status" class="text-xs font-medium text-emerald-400 flex items-center gap-1 hidden sm:flex">☁️ พร้อมใช้งาน</div>
             <div class="border-l border-slate-700 pl-4 space-x-2 flex items-center">
-                <button onclick="createNewCourse()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-md font-medium transition text-xs">+ สร้างใหม่</button>
-                <button onclick="editCourseName()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 rounded-md font-medium transition text-xs">✏️ แก้ไขชื่อ</button>
-                <button onclick="emergencyReset()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs">🛠 ล้างระบบ</button>
+                <button onclick="createNewCourse()" class="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">+ สร้างใหม่</button>
+                <button onclick="editCourseName()" class="bg-amber-600 hover:bg-amber-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">✏️ แก้ไขชื่อ</button>
+                <button onclick="localStorage.clear(); window.location.reload();" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-md font-medium transition text-xs shadow-sm">🛠 ล้างบั๊ก</button>
             </div>
         </div>
     </div>
@@ -44,7 +61,7 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3 w-full md:w-auto justify-center md:justify-start">
                 <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold text-lg">🏫</div>
-                <span class="text-xl font-semibold tracking-wide text-indigo-700">ClassroomOS <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full ml-1">Pro Edition</span></span>
+                <span class="text-xl font-semibold tracking-wide text-indigo-700">ClassroomOS <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full ml-1">AI Edition</span></span>
             </div>
             <div class="flex space-x-2 bg-slate-100 p-1 rounded-xl overflow-x-auto w-full md:w-auto justify-center">
                 <button onclick="switchTab('attendance-tab')" id="btn-attendance" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition bg-white text-indigo-600 shadow-sm whitespace-nowrap">⏰ เช็คชื่อ</button>
@@ -55,18 +72,28 @@
     </nav>
 
     <main class="max-w-7xl mx-auto p-4 md:p-8" id="main-content">
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
                 <h2 class="text-lg font-semibold text-slate-900">จัดการรายชื่อ <span class="text-indigo-600" id="display-course-name"></span></h2>
-                <p class="text-slate-500 text-sm">รองรับไฟล์ Excel (.xlsx) และ PDF</p>
+                <p class="text-slate-500 text-sm">เพิ่มเอง, นำเข้า Excel หรือใช้ AI สแกนจากรูปภาพ</p>
             </div>
-            <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                <input type="file" id="import-file" accept=".csv, .xlsx, .xls, .pdf" class="hidden" onchange="importData(event)">
-                <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-2 w-full md:w-auto">
-                    📥 อัปโหลดไฟล์รายชื่อ
+            <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                    ➕ เพิ่มเอง
+                </button>
+                
+                <input type="file" id="import-image" accept="image/*" class="hidden" onchange="importFromImage(event)">
+                <label for="import-image" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                    📸 สแกนรูปภาพ
                 </label>
-                <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-4 py-2.5 rounded-xl text-sm font-medium transition w-full md:w-auto">
-                    🔄 ดึงข้อมูลจาก Cloud
+
+                <input type="file" id="import-file" accept=".csv, .xlsx, .xls, .pdf" class="hidden" onchange="importData(event)">
+                <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                    📥 นำเข้าไฟล์
+                </label>
+                
+                <button onclick="forceSyncFromCloud()" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-4 py-2.5 rounded-xl text-sm font-medium transition flex-1 sm:flex-none">
+                    🔄 ดึงข้อมูล
                 </button>
             </div>
         </div>
@@ -81,14 +108,14 @@
                         </h3>
                         <input type="date" id="attendance-date" onchange="loadAttendance()" class="mt-2 border border-slate-200 rounded-xl px-4 py-2 outline-none text-slate-700">
                     </div>
-                    <button onclick="saveAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl shadow-sm transition">💾 บันทึกขึ้นคลาวด์</button>
+                    <button onclick="saveAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl shadow-sm transition w-full sm:w-auto">💾 บันทึกขึ้นคลาวด์</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <tr>
                                 <th class="p-4 pl-6 w-32">รหัส</th>
-                                <th class="p-4">ชื่อ-นามสกุล <span class="text-xs font-normal text-slate-400 lowercase">(คลิก ✏️ เพื่อแก้)</span></th>
+                                <th class="p-4">ชื่อ-นามสกุล <span class="text-xs font-normal text-slate-400 lowercase">(นำเมาส์ชี้เพื่อแก้ไข/ลบ)</span></th>
                                 <th class="p-4 text-center">สถานะ และ หมายเหตุ</th>
                             </tr>
                         </thead>
@@ -105,8 +132,8 @@
                         <h3 class="font-semibold text-lg text-slate-900">บันทึกคะแนนรายชิ้นงาน</h3>
                         <p class="text-xs text-slate-500">* ระบบจะเซฟคะแนนให้อัตโนมัติเมื่อพิมพ์ตัวเลขเสร็จ</p>
                     </div>
-                    <button onclick="addNewTask()" class="bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
-                        ➕ เพิ่มชิ้นงาน/ช่องคะแนน
+                    <button onclick="addNewTask()" class="bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm w-full sm:w-auto">
+                        ➕ เพิ่มช่องคะแนน
                     </button>
                 </div>
                 <div class="overflow-x-auto">
@@ -167,42 +194,38 @@
     </div>
 
     <div id="cloud-loader" class="fixed inset-0 bg-white/90 flex flex-col justify-center items-center z-50 hidden backdrop-blur-sm">
-        <div class="text-5xl mb-4 spin">⏳</div>
-        <h2 class="text-xl font-bold text-indigo-700">กำลังเชื่อมต่อฐานข้อมูล...</h2>
+        <div id="loader-icon" class="text-5xl mb-4 spin">⏳</div>
+        <h2 id="loader-title" class="text-xl font-bold text-indigo-700">กำลังประมวลผล...</h2>
+        <p id="loader-desc" class="text-slate-500 text-sm mt-2">กรุณารอสักครู่</p>
     </div>
 
     <script>
         // 🔴 ลิงก์ Google Sheets 🔴
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6MXOQbfSQy9cqqG1RXMuD2F0HKoddn4fZNY-WM6KWb1izwRNhAV4IexGzlydV7sg/exec';
 
-        // --- ระบบแจ้งเตือน Pop-up (Toast) ---
+        // Toast 
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
-            toast.className = `fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[100] transform translate-y-0 font-medium ${isError ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white'}`;
+            toast.className = `fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[100] transform translate-y-0 font-medium text-white ${isError ? 'bg-rose-600' : 'bg-emerald-600'}`;
             toast.style.opacity = 1;
             setTimeout(() => { toast.style.opacity = 0; toast.style.transform = 'translateY(1rem)'; }, 3000);
         }
 
+        // 🛡️ Safe Parse
         function safeParse(key, fallback) {
             try {
                 let data = localStorage.getItem(key);
-                if (data === "undefined" || data === null || data === "[object Object]") return fallback;
+                if (!data || data === "undefined" || data === "[object Object]") return fallback;
                 let parsed = JSON.parse(data);
-                return (parsed !== null && parsed !== undefined) ? parsed : fallback;
+                if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+                if (!Array.isArray(fallback) && typeof parsed !== 'object') return fallback;
+                return parsed !== null ? parsed : fallback;
             } catch(e) { return fallback; }
         }
 
-        let courses = safeParse('sys_courses', []);
+        let courses = [], students = [], attendanceData = {}, tasks = [], scores = {}, remarksData = {};
         let currentCourseId = localStorage.getItem('sys_activeCourse') || null;
-        let students = [], attendanceData = {}, tasks = [], scores = {}, remarksData = {};
-
-        function emergencyReset() {
-            if(confirm('⚠️ ระบบจะล้างข้อมูลที่ค้างอยู่ในเครื่องของคุณครูทั้งหมดเพื่อแก้บั๊กจอขาว ยืนยันหรือไม่?')) {
-                localStorage.clear();
-                window.location.reload();
-            }
-        }
 
         function updateSyncUI(status) {
             const ui = document.getElementById('sync-status');
@@ -211,9 +234,22 @@
             else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 flex items-center gap-1 hidden sm:flex"; }
         }
 
+        function showLoader(title, desc, icon = '⏳', isSpin = true) {
+            document.getElementById('cloud-loader').classList.remove('hidden');
+            document.getElementById('loader-title').textContent = title;
+            document.getElementById('loader-desc').textContent = desc;
+            document.getElementById('loader-icon').textContent = icon;
+            if(isSpin) document.getElementById('loader-icon').classList.add('spin');
+            else document.getElementById('loader-icon').classList.remove('spin');
+        }
+
+        function hideLoader() {
+            document.getElementById('cloud-loader').classList.add('hidden');
+        }
+
         async function forceSyncFromCloud() {
             if(!SCRIPT_URL) return;
-            document.getElementById('cloud-loader').classList.remove('hidden');
+            showLoader("กำลังดึงข้อมูลคลาวด์...", "ซิงค์กับ Google Sheets");
             try {
                 const response = await fetch(SCRIPT_URL);
                 const cloudData = await response.json();
@@ -227,8 +263,8 @@
                 if(currentCourseId) localStorage.setItem('sys_activeCourse', currentCourseId);
                 initApp(false);
                 updateSyncUI('success');
-            } catch (error) { updateSyncUI('error'); } 
-            finally { document.getElementById('cloud-loader').classList.add('hidden'); }
+            } catch (error) { updateSyncUI('error'); showToast('ไม่สามารถเชื่อมต่อ Cloud ได้', true);
+            } finally { hideLoader(); }
         }
 
         function saveToCloud(key, data) {
@@ -239,6 +275,7 @@
         }
 
         function saveData(key, data) {
+            if(!currentCourseId) return;
             localStorage.setItem(`${key}_${currentCourseId}`, JSON.stringify(data));
             saveToCloud(`${key}_${currentCourseId}`, data);
         }
@@ -249,20 +286,24 @@
         }
 
         function initApp(checkCloudFirst = true) {
-            try {
-                document.getElementById('attendance-date').valueAsDate = new Date();
-                if (checkCloudFirst && SCRIPT_URL && courses.length === 0) { forceSyncFromCloud(); return; }
-                if (courses.length === 0) {
-                    document.getElementById('no-course-overlay').classList.remove('hidden');
-                    document.getElementById('main-content').classList.add('hidden');
-                } else {
-                    document.getElementById('no-course-overlay').classList.add('hidden');
-                    document.getElementById('main-content').classList.remove('hidden');
-                    if(!currentCourseId || !courses.find(c => c.id === currentCourseId)) currentCourseId = courses[0].id;
-                    updateCourseDropdown();
-                    loadDataForCurrentCourse();
+            courses = safeParse('sys_courses', []);
+            document.getElementById('attendance-date').valueAsDate = new Date();
+            
+            if (checkCloudFirst && SCRIPT_URL && courses.length === 0) { forceSyncFromCloud(); return; }
+            
+            if (courses.length === 0) {
+                document.getElementById('no-course-overlay').classList.remove('hidden');
+                document.getElementById('main-content').classList.add('hidden');
+            } else {
+                document.getElementById('no-course-overlay').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                
+                if(!currentCourseId || !courses.find(c => c.id === currentCourseId)) {
+                    currentCourseId = courses[0].id;
+                    localStorage.setItem('sys_activeCourse', currentCourseId);
                 }
-            } catch(e) { console.error(e); }
+                updateCourseDropdown(); loadDataForCurrentCourse();
+            }
         }
 
         function updateCourseDropdown() {
@@ -281,31 +322,26 @@
                 saveGlobalData('sys_courses', courses);
                 currentCourseId = courses[courses.length-1].id;
                 localStorage.setItem('sys_activeCourse', currentCourseId);
-                initApp(false);
-                showToast(`สร้างวิชา ${name} สำเร็จ!`);
+                initApp(false); showToast(`สร้างวิชา ${name} สำเร็จ!`);
             }
         }
 
-        // 🌟 ฟังก์ชันใหม่: แก้ไขชื่อวิชา
         function editCourseName() {
-            if (!currentCourseId || courses.length === 0) return showToast("ไม่มีรายวิชาให้แก้ไข", true);
+            if (!currentCourseId || courses.length === 0) return;
             const courseIndex = courses.findIndex(c => c.id === currentCourseId);
             if (courseIndex > -1) {
                 const currentName = courses[courseIndex].name;
                 const newName = prompt("แก้ไขชื่อห้อง/รายวิชา:", currentName);
                 if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
                     courses[courseIndex].name = newName.trim();
-                    saveGlobalData('sys_courses', courses);
-                    updateCourseDropdown();
-                    showToast(`เปลี่ยนชื่อวิชาเป็น "${newName.trim()}" สำเร็จ!`);
+                    saveGlobalData('sys_courses', courses); updateCourseDropdown(); showToast(`เปลี่ยนชื่อวิชาสำเร็จ!`);
                 }
             }
         }
 
         function changeCourse() {
             currentCourseId = document.getElementById('course-selector').value;
-            localStorage.setItem('sys_activeCourse', currentCourseId);
-            initApp(false);
+            localStorage.setItem('sys_activeCourse', currentCourseId); initApp(false);
         }
 
         function loadDataForCurrentCourse() {
@@ -336,37 +372,71 @@
             if(tabId === 'report-tab') generateReport();
         }
 
+        // --- เพิ่ม / แก้ไข / ลบ รายชื่อ ---
+        function addStudentManual() {
+            if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
+            const newId = prompt("ใส่ 'รหัสประจำตัว' (เช่น 680001):");
+            if (!newId || newId.trim() === "") return;
+            if (students.find(s => s.id === newId.trim())) return showToast("รหัสนี้มีในระบบแล้ว!", true);
+
+            const newName = prompt("ใส่ 'ชื่อ-นามสกุล' :");
+            if (!newName || newName.trim() === "") return;
+
+            students.push({ id: newId.trim(), name: newName.trim() });
+            students.sort((a,b) => a.id.localeCompare(b.id)); 
+            saveData('students', students); loadAttendance(); showToast(`เพิ่มรายชื่อ ${newName.trim()} สำเร็จ!`);
+        }
+
         function editStudent(id) {
             const student = students.find(s => s.id === id);
             if (student) {
-                const newName = prompt(`แก้ไขชื่อ:`, student.name);
-                if (newName && newName.trim() !== "") { student.name = newName.trim(); saveData('students', students); loadAttendance(); showToast('แก้ไขชื่อสำเร็จ');}
+                const newName = prompt(`แก้ไขชื่อของ ${id}:`, student.name);
+                if (newName && newName.trim() !== "") { 
+                    student.name = newName.trim(); saveData('students', students); loadAttendance(); showToast('แก้ไขชื่อสำเร็จ');
+                }
             }
         }
 
-        // --- ระบบเช็คชื่อ (ปุ่มเทาเริ่มต้น, ลา, หมายเหตุ) ---
+        function deleteStudent(id) {
+            const student = students.find(s => s.id === id);
+            if(!student) return;
+            if(confirm(`⚠️ ต้องการลบ "${student.name}" ออกจากวิชานี้ใช่หรือไม่?`)) {
+                students = students.filter(s => s.id !== id);
+                saveData('students', students); loadAttendance(); showToast(`ลบรายชื่อสำเร็จ!`);
+            }
+        }
+
+        // --- ระบบเช็คชื่อ ---
         function loadAttendance() {
             const date = document.getElementById('attendance-date').value;
             const tbody = document.getElementById('attendance-list'); tbody.innerHTML = '';
-            if (students.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อ กรุณานำเข้าไฟล์ Excel</td></tr>'; return; }
+            if (students.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อ กรุณาเพิ่มรายชื่อ</td></tr>'; return; }
             
             const dayRecord = attendanceData[date] || {};
             const dayRemarks = remarksData[date] || {};
 
             students.forEach(student => {
-                const status = dayRecord[student.id] || null; // เป็น Null เริ่มต้น
+                const status = dayRecord[student.id] || null;
                 const remark = dayRemarks[student.id] || '';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="p-4 pl-6 text-slate-500 font-mono text-xs">${student.id}</td>
-                    <td class="p-4 font-medium"><div class="flex items-center gap-2 group"><span>${student.name}</span><button onclick="editStudent('${student.id}')" class="text-slate-300 hover:text-indigo-500 text-xs transition opacity-0 group-hover:opacity-100">✏️ แก้ไข</button></div></td>
-                    <td class="p-4 flex flex-wrap justify-center gap-2 items-center">
+                    <td class="p-4 font-medium">
+                        <div class="flex items-center gap-2 group">
+                            <span class="truncate max-w-[120px] md:max-w-none">${student.name}</span>
+                            <div class="opacity-0 group-hover:opacity-100 transition flex gap-1">
+                                <button onclick="editStudent('${student.id}')" class="text-slate-500 hover:text-indigo-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="แก้ไขชื่อ">✏️</button>
+                                <button onclick="deleteStudent('${student.id}')" class="text-slate-500 hover:text-rose-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="ลบรายชื่อ">🗑️</button>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 flex flex-wrap justify-center gap-1 md:gap-2 items-center">
                         ${createStatusBtn(student.id, 'present', 'มา', 'emerald', status === 'present')}
                         ${createStatusBtn(student.id, 'absent', 'ขาด', 'rose', status === 'absent')}
                         ${createStatusBtn(student.id, 'late', 'สาย', 'amber', status === 'late')}
                         ${createStatusBtn(student.id, 'leave', 'ลา', 'purple', status === 'leave')}
-                        <input type="text" placeholder="หมายเหตุ..." value="${remark}" onchange="setRemark('${student.id}', this.value)" class="text-xs border border-slate-200 rounded px-2 py-1.5 w-24 md:w-32 focus:ring-1 focus:ring-indigo-400 outline-none placeholder-slate-300">
+                        <input type="text" placeholder="หมายเหตุ..." value="${remark}" onchange="setRemark('${student.id}', this.value)" class="text-xs border border-slate-200 rounded px-2 py-1.5 w-20 md:w-32 focus:ring-1 focus:ring-indigo-400 outline-none">
                     </td>`;
                 tbody.appendChild(tr);
             });
@@ -374,7 +444,7 @@
         
         function createStatusBtn(sId, val, label, color, isActive) {
             const activeClass = isActive ? `bg-${color}-500 text-white shadow-md ring-2 ring-${color}-500/20` : `bg-slate-100 text-slate-400 hover:bg-slate-200`;
-            return `<button onclick="setStatus('${sId}', '${val}')" class="${activeClass} px-3 py-1.5 rounded-full text-xs font-bold transition-all">${label}</button>`;
+            return `<button onclick="setStatus('${sId}', '${val}')" class="${activeClass} px-3 py-1.5 rounded-full text-[10px] md:text-xs font-bold transition-all">${label}</button>`;
         }
         
         function setStatus(sId, val) {
@@ -398,12 +468,10 @@
             let count = 0;
             students.forEach(s => {
                 if (!attendanceData[date][s.id]) { 
-                    attendanceData[date][s.id] = 'present';
-                    count++;
+                    attendanceData[date][s.id] = 'present'; count++;
                 }
             });
-            loadAttendance();
-            showToast(`✅ ติ๊กมาเรียนให้ ${count} คน สำเร็จ`);
+            loadAttendance(); showToast(`✅ ติ๊กมาเรียนให้ ${count} คน สำเร็จ`);
         }
 
         function saveAttendance() {
@@ -412,23 +480,16 @@
             if (!attendanceData[date]) attendanceData[date] = {};
             
             let unmarked = 0;
-            students.forEach(s => {
-                if (!attendanceData[date][s.id]) unmarked++;
-            });
+            students.forEach(s => { if (!attendanceData[date][s.id]) unmarked++; });
+            if (unmarked > 0 && !confirm(`⚠️ มี ${unmarked} คน ยังไม่ได้เช็คชื่อ บันทึกแค่นี้ใช่หรือไม่?`)) return;
 
-            if (unmarked > 0) {
-                const confirmSave = confirm(`⚠️ มีนักเรียน ${unmarked} คน ที่ยังไม่ได้เช็คชื่อ (ปุ่มสีเทา) \nต้องการบันทึกข้อมูลแค่นี้ใช่หรือไม่?`);
-                if(!confirmSave) return;
-            }
-
-            saveData('attendance', attendanceData); 
-            saveData('remarks', remarksData);
-            showToast('💾 บันทึกเช็คชื่อขึ้น Cloud สำเร็จ!');
+            saveData('attendance', attendanceData); saveData('remarks', remarksData);
+            showToast('💾 บันทึกเช็คชื่อสำเร็จ!');
         }
 
         // --- SCORES ---
         function addNewTask() {
-            const taskName = prompt("ชื่อชิ้นงาน/ช่องคะแนน:"); if (!taskName) return;
+            const taskName = prompt("ชื่อช่องคะแนน:"); if (!taskName) return;
             const maxScore = prompt("คะแนนเต็ม?:", "10"); if (!maxScore || isNaN(maxScore)) return;
             tasks.push({ id: 'task_' + Date.now(), name: taskName, maxScore: parseFloat(maxScore) });
             saveData('tasks', tasks); renderScoreTable(); showToast('เพิ่มช่องคะแนนสำเร็จ');
@@ -444,12 +505,13 @@
             const header = document.getElementById('score-header'); const body = document.getElementById('score-body');
             header.innerHTML = ''; body.innerHTML = '';
             if (students.length === 0) { body.innerHTML = '<tr><td colspan="100%" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อ</td></tr>'; return; }
+            
             let headerRow = `<tr><th class="p-4 pl-6 w-64">นักเรียน</th>`;
-            tasks.forEach(task => { headerRow += `<th class="p-4 text-center border-l border-slate-200 min-w-[120px]"><div class="text-slate-900 truncate">${task.name}</div><div class="text-[10px] text-slate-400">เต็ม ${task.maxScore}</div><button onclick="removeTask('${task.id}')" class="text-rose-400 hover:text-rose-600 text-[9px] block mx-auto mt-1">[ลบ]</button></th>`; });
+            tasks.forEach(task => { headerRow += `<th class="p-4 text-center border-l border-slate-200 min-w-[100px]"><div class="text-slate-900 truncate">${task.name}</div><div class="text-[10px] text-slate-400">เต็ม ${task.maxScore}</div><button onclick="removeTask('${task.id}')" class="text-rose-400 hover:text-rose-600 text-[9px] block mx-auto mt-1">[ลบ]</button></th>`; });
             headerRow += `</tr>`; header.innerHTML = headerRow;
 
             students.forEach(student => {
-                let row = `<tr class="hover:bg-slate-50 transition"><td class="p-4 pl-6 font-medium"><div class="text-slate-900 text-sm">${student.name}</div><div class="text-xs text-slate-400">${student.id}</div></td>`;
+                let row = `<tr class="hover:bg-slate-50 transition"><td class="p-4 pl-6 font-medium"><div class="text-slate-900 text-sm truncate max-w-[120px] md:max-w-none">${student.name}</div><div class="text-xs text-slate-400">${student.id}</div></td>`;
                 tasks.forEach(task => {
                     const currentScore = (scores[student.id] && scores[student.id][task.id]) !== undefined ? scores[student.id][task.id] : '';
                     row += `<td class="p-2 border-l border-slate-100"><input type="number" class="w-full text-center bg-transparent border-none focus:bg-white focus:ring-2 focus:ring-indigo-100 rounded py-2 outline-none font-semibold ${currentScore !== '' && currentScore > task.maxScore ? 'text-rose-600' : 'text-indigo-600'}" placeholder="-" value="${currentScore}" onchange="updateScore('${student.id}', '${task.id}', this.value, ${task.maxScore})"></td>`;
@@ -460,8 +522,7 @@
         function updateScore(studentId, taskId, value, max) {
             if (!scores[studentId]) scores[studentId] = {};
             let numValue = value === '' ? '' : parseFloat(value);
-            scores[studentId][taskId] = numValue; saveData('scores', scores);
-            showToast('✅ เซฟคะแนนแล้ว'); 
+            scores[studentId][taskId] = numValue; saveData('scores', scores); showToast('✅ เซฟคะแนนแล้ว'); 
         }
 
         // --- REPORTS ---
@@ -490,12 +551,10 @@
                 filterDates = allDates.filter(d => new Date(d).getMonth() === today.getMonth() && new Date(d).getFullYear() === today.getFullYear());
                 reportTitle = `รายงานสรุปรายเดือน (${today.toLocaleDateString('th-TH', {month: 'long', year: 'numeric'})})`;
             }
-            
             document.getElementById('report-title-display').textContent = reportTitle;
 
-            // หัวตาราง
             let headerHtml = `<tr><th class="p-4 pl-6 w-64">ชื่อ-นามสกุล</th><th class="p-4 text-center">มา</th><th class="p-4 text-center">ขาด</th><th class="p-4 text-center">สาย</th><th class="p-4 text-center text-purple-600">ลา</th>`;
-            tasks.forEach(t => { headerHtml += `<th class="p-4 text-center border-l text-[10px] min-w-[80px]">${t.name}<br>(${t.maxScore})</th>`; });
+            tasks.forEach(t => { headerHtml += `<th class="p-4 text-center border-l text-[10px] min-w-[80px]">${t.name}</th>`; });
             headerHtml += `<th class="p-4 text-right pr-6 border-l text-indigo-600">คะแนนรวม</th><th class="p-4 text-left border-l">หมายเหตุ</th></tr>`;
             theader.innerHTML = headerHtml;
 
@@ -512,12 +571,8 @@
                         if (sStats[stat] !== undefined) { sStats[stat]++; overall[stat]++; }
                     }
                     if (remarksData[date] && remarksData[date][student.id]) {
-                        if (filterDates.length === 1) {
-                            stRemarks.push(remarksData[date][student.id]);
-                        } else {
-                            const dStr = new Date(date).getDate() + '/' + (new Date(date).getMonth() + 1);
-                            stRemarks.push(`(${dStr}) ${remarksData[date][student.id]}`);
-                        }
+                        if (filterDates.length === 1) stRemarks.push(remarksData[date][student.id]);
+                        else stRemarks.push(`(${new Date(date).getDate()}/${new Date(date).getMonth() + 1}) ${remarksData[date][student.id]}`);
                     }
                 });
                 
@@ -546,7 +601,6 @@
         function exportToExcel() {
             if (students.length === 0) return showToast("ไม่มีข้อมูลสำหรับ Export", true);
             const courseName = courses.find(c => c.id === currentCourseId)?.name || 'Report';
-            
             let table = document.getElementById('report-table');
             let wb = XLSX.utils.table_to_book(table, {sheet:"ClassroomOS Report"});
             XLSX.writeFile(wb, `รายงาน_${courseName}.xlsx`);
@@ -554,7 +608,7 @@
         }
 
         function exportToPDF() {
-            if (students.length === 0) return showToast("ไม่มีข้อมูลสำหรับ Export", true);
+            if (students.length === 0) return showToast("ไม่มีข้อมูล", true);
             const courseName = courses.find(c => c.id === currentCourseId)?.name || '';
             const pdfContainer = document.createElement('div'); pdfContainer.style.padding = '20px'; pdfContainer.style.fontFamily = "'Kanit', sans-serif";
             
@@ -578,9 +632,64 @@
             html2pdf().set({ margin: 0.5, filename: `รายงาน_${courseName}.pdf`, jsPDF: { orientation: 'landscape' } }).from(pdfContainer).save().then(() => showToast('✅ ดาวน์โหลด PDF สำเร็จ!'));
         }
 
+        // 🌟 🤖 ฟังก์ชันใหม่: AI สแกนข้อความจากรูปภาพ (OCR) 🤖 🌟
+        async function importFromImage(event) {
+            if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoader("กำลังประมวลผลรูปภาพด้วย AI", "ระบบกำลังอ่านรายชื่อ อาจใช้เวลาสักครู่ ห้ามปิดหน้าต่างนี้", "📸", true);
+
+            try {
+                // เรียกใช้ Tesseract.js (ภาษาไทย + อังกฤษ)
+                const result = await Tesseract.recognize(file, 'tha+eng');
+                const lines = result.data.text.split('\n');
+                let parsedStudents = [];
+
+                lines.forEach(line => {
+                    // มองหารหัสประจำตัว 10-13 หลัก (ปรับได้ตามมาตรฐานของวิทยาลัย)
+                    const idMatch = line.match(/\b\d{10,13}\b/);
+                    if (idMatch) {
+                        const sId = idMatch[0];
+                        // ตัดสตริงตั้งแต่รหัสเป็นต้นไป แล้วค่อยสกัดชื่อ
+                        let name = line.substring(line.indexOf(sId) + sId.length);
+                        // ลบอักขระขยะด้านหน้าและด้านหลัง
+                        name = name.replace(/^[^\u0E00-\u0E7Fa-zA-Z]+/, '').trim();
+                        // เอาตัวเลข, เครื่องหมายวรรคตอนที่ผิดปกติออก แต่เก็บช่องว่างระหว่างชื่อกับนามสกุลไว้
+                        name = name.replace(/[\d\.\,\-_]/g, "").replace(/\s{2,}/g, " ").trim();
+                        
+                        // ป้องกันรายชื่อสั้นเกินไปหรือขยะ
+                        if (name.length > 4) {
+                            parsedStudents.push({ id: sId, name: name });
+                        }
+                    }
+                });
+
+                if (parsedStudents.length > 0) {
+                    const uMap = new Map();
+                    students.forEach(s => uMap.set(s.id, s)); // ของเดิม
+                    parsedStudents.forEach(s => uMap.set(s.id, s)); // ของใหม่จากรูป
+                    students = Array.from(uMap.values()).sort((a,b) => a.id.localeCompare(b.id));
+
+                    saveData('students', students); 
+                    loadAttendance(); 
+                    showToast(`✅ สแกนรูปภาพสำเร็จ! เพิ่มรายชื่อ ${parsedStudents.length} คน`);
+                } else {
+                    showToast("❌ ไม่พบรหัสและชื่อที่เข้าคู่กัน (แนะนำให้ครอปเฉพาะช่วงรายชื่อให้ชัดเจน)", true);
+                }
+            } catch (error) {
+                console.error(error);
+                showToast("เกิดข้อผิดพลาดในการอ่านรูปภาพ", true);
+            } finally {
+                hideLoader();
+                event.target.value = '';
+            }
+        }
+
+        // นำเข้า Excel/PDF
         async function importData(event) {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true); const file = event.target.files[0]; if (!file) return;
-            showToast('⏳ กำลังอ่านไฟล์...');
+            showLoader("กำลังอ่านไฟล์ข้อมูล", "รอสักครู่...");
             if (file.name.toLowerCase().endsWith('.pdf')) {
                 try {
                     const arrayBuffer = await file.arrayBuffer();
@@ -607,8 +716,9 @@
                     if (parsedStudents.length > 0) {
                         const uMap = new Map(); parsedStudents.forEach(s => uMap.set(s.id, s)); students = Array.from(uMap.values()).sort((a,b) => a.id.localeCompare(b.id));
                         saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า PDF สำเร็จ ${students.length} คน`);
-                    } else { showToast("อ่าน PDF ไม่สำเร็จ แนะนำให้ใช้ไฟล์ Excel ครับ", true); }
+                    } else { showToast("อ่าน PDF ไม่สำเร็จ แนะนำให้ใช้ Excel/ภาพ", true); }
                 } catch (e) { showToast("เกิดข้อผิดพลาดในการอ่าน PDF", true); }
+                finally { hideLoader(); }
             } else {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -618,11 +728,12 @@
                         if(idK && nmK && row[idK] && row[nmK]) fmt.push({ id: String(row[idK]).trim(), name: String(row[nmK]).trim() });
                     });
                     if (fmt.length > 0) { students = fmt; saveData('students', students); loadAttendance(); showToast(`✅ นำเข้า Excel สำเร็จ ${students.length} คน`); }
+                    hideLoader();
                 }; reader.readAsBinaryString(file);
             } event.target.value = '';
         }
 
-        initApp(true);
+        window.onload = function() { initApp(true); };
     </script>
 </body>
 </html>
