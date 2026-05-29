@@ -94,6 +94,11 @@
                     <button onclick="deleteAllStudents()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
                         🗑️ ล้างทั้งหมด
                     </button>
+                    
+                    <button onclick="forceSyncFromCloud()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
+                        🔄 ดึงข้อมูลคลาวด์
+                    </button>
+
                 </div>
             </div>
 
@@ -270,7 +275,6 @@
             else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 flex items-center gap-1 hidden sm:flex"; }
         }
 
-        // ดึงข้อมูลและเซฟข้อมูลใช้ระบบเดิม (ไม่แยก user) เพื่อให้ข้อมูลเก่ากลับมาทั้งหมด
         async function forceSyncFromCloud() {
             if(!SCRIPT_URL) return; showLoader("กำลังดึงข้อมูลคลาวด์...", "ซิงค์กับ Google Sheets");
             try {
@@ -439,7 +443,7 @@
             students.forEach(student => {
                 const status = dayRecord[student.id] || null; const remark = dayRemarks[student.id] || '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-4 pl-6 text-slate-500 font-mono text-xs">${student.id}</td><td class="p-4 font-medium"><div class="flex items-center gap-2 group"><span class="truncate max-w-[120px] md:max-w-none">${student.name}</span><div class="opacity-0 group-hover:opacity-100 transition flex gap-1"><button onclick="editStudentData('${student.id}')" class="text-slate-500 hover:text-indigo-600 bg-slate-100 px-2 py-1 rounded text-[10px]">✏️</button><button onclick="deleteStudent('${student.id}')" class="text-slate-500 hover:text-rose-600 bg-slate-100 px-2 py-1 rounded text-[10px]">🗑️</button></div></div></td><td class="p-4 flex flex-wrap justify-center gap-1 md:gap-2 items-center">${createStatusBtn(student.id, 'present', 'มา', 'emerald', status === 'present')}${createStatusBtn(student.id, 'absent', 'ขาด', 'rose', status === 'absent')}${createStatusBtn(student.id, 'late', 'สาย', 'amber', status === 'late')}${createStatusBtn(student.id, 'leave', 'ลา', 'purple', status === 'leave')}<input type="text" placeholder="หมายเหตุ..." value="${remark}" onchange="setRemark('${student.id}', this.value)" class="text-xs border border-slate-200 rounded px-2 py-1.5 w-20 md:w-32 focus:ring-1 focus:ring-indigo-400 outline-none"></td>`;
+                tr.innerHTML = `<td class="p-4 pl-6 text-slate-500 font-mono text-xs">${student.id}</td><td class="p-4 font-medium"><div class="flex items-center gap-2 group"><span class="truncate max-w-[120px] md:max-w-none">${student.name}</span><div class="opacity-0 group-hover:opacity-100 transition flex gap-1"><button onclick="editStudentData('${student.id}')" class="text-slate-500 hover:text-indigo-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="แก้ไขชื่อ">✏️</button><button onclick="deleteStudent('${student.id}')" class="text-slate-500 hover:text-rose-600 bg-slate-100 px-2 py-1 rounded text-[10px]" title="ลบรายชื่อ">🗑️</button></div></div></td><td class="p-4 flex flex-wrap justify-center gap-1 md:gap-2 items-center">${createStatusBtn(student.id, 'present', 'มา', 'emerald', status === 'present')}${createStatusBtn(student.id, 'absent', 'ขาด', 'rose', status === 'absent')}${createStatusBtn(student.id, 'late', 'สาย', 'amber', status === 'late')}${createStatusBtn(student.id, 'leave', 'ลา', 'purple', status === 'leave')}<input type="text" placeholder="หมายเหตุ..." value="${remark}" onchange="setRemark('${student.id}', this.value)" class="text-xs border border-slate-200 rounded px-2 py-1.5 w-20 md:w-32 focus:ring-1 focus:ring-indigo-400 outline-none"></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -557,8 +561,6 @@
                 }; reader.readAsBinaryString(file);
             } event.target.value = '';
         }
-
-        // ⚠️ สำคัญ: ถ้าครูเผลอแก้ฝั่ง Google Apps Script ไปแล้ว อย่าลืมเปลี่ยนโค้ดกลับไปเป็นโค้ดดั้งเดิมด้วยนะครับ ข้อมูลเก่าถึงจะโหลดขึ้นมาครับ!
     </script>
 </body>
 </html>
