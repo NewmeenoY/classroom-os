@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassroomOS Pro - Secure Edition</title>
+    <title>ClassroomOS Pro - Ultimate Edition</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     
     <style>
         body { font-family: 'Kanit', sans-serif; }
@@ -20,27 +23,35 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
         #toast { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
     </style>
+
+    <!-- 🚨 ระบบป้องกันจอขาว 🚨 -->
+    <script>
+        window.onerror = function(message, source, lineno) {
+            document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background-color:#f8fafc; font-family:'Kanit', sans-serif; text-align:center; padding:20px;"><div style="font-size: 50px; margin-bottom: 20px;">⚠️</div><h1 style="color:#e11d48; font-size:24px; font-weight:bold; margin-bottom:10px;">ระบบขัดข้อง</h1><p style="color:#64748b; margin-bottom:30px; font-size:14px;">กรุณากดปุ่มด้านล่างเพื่อล้างข้อมูลที่ค้างอยู่ (ข้อมูลบน Google Sheets จะไม่หาย)</p><button onclick="localStorage.clear(); window.location.reload();" style="background-color:#e11d48; color:white; padding:12px 24px; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">🛠 กดที่นี่เพื่อซ่อมแซมระบบ</button></div>`;
+            return true;
+        };
+    </script>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
 
+    <!-- แจ้งเตือน Pop-up -->
     <div id="toast" class="fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none z-[100] transform translate-y-4 font-medium text-white"></div>
 
+    <!-- 🌟 หน้าจอ Login (Master Password) 🌟 -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900/95 flex justify-center items-center z-[200] backdrop-blur-sm">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4 border border-slate-100 text-center">
             <div class="bg-indigo-100 text-indigo-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">🔒</div>
             <h2 class="text-2xl font-bold text-slate-800">ClassroomOS Pro</h2>
             <p class="text-slate-500 text-sm mt-1 mb-6">กรุณาใส่รหัสผ่านเพื่อเข้าใช้งาน</p>
-            
             <input type="password" id="login-password" class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition text-center text-xl tracking-widest mb-4" placeholder="••••••" onkeypress="if(event.key === 'Enter') checkLogin()">
-            
-            <button onclick="checkLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex justify-center items-center gap-2">
-                เข้าสู่ระบบ
-            </button>
+            <button onclick="checkLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex justify-center items-center gap-2">เข้าสู่ระบบ</button>
         </div>
     </div>
 
+    <!-- 🌟 คอนเทนต์หลักของแอป 🌟 -->
     <div id="app-container" class="hidden">
         
+        <!-- แถบด้านบน -->
         <div class="bg-slate-900 text-white px-6 py-2 text-sm flex justify-between items-center z-50 relative overflow-x-auto">
             <div class="flex items-center space-x-3 whitespace-nowrap">
                 <span class="text-slate-400 hidden md:inline">รายวิชา/กิจกรรม:</span>
@@ -56,6 +67,7 @@
             </div>
         </div>
 
+        <!-- แถบเมนู -->
         <nav class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-40 shadow-sm">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center space-x-3 w-full md:w-auto justify-center md:justify-start">
@@ -71,48 +83,46 @@
         </nav>
 
         <main class="max-w-7xl mx-auto p-4 md:p-8" id="main-content">
+            <!-- จัดการรายชื่อ -->
             <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900">จัดการรายชื่อ <span class="text-indigo-600" id="display-course-name"></span></h2>
                     <p class="text-slate-500 text-sm">เพิ่มเอง, นำเข้าไฟล์ หรือสแกนจากรูปภาพ</p>
                 </div>
                 <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-                    <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        ➕ เพิ่มรายชื่อ
-                    </button>
-                    <button onclick="sortStudents()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        🔀 เรียงตามรหัส
-                    </button>
+                    <button onclick="addStudentManual()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition flex-1 sm:flex-none">➕ เพิ่มรายชื่อ</button>
+                    <button onclick="sortStudents()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition flex-1 sm:flex-none">🔀 เรียงตามรหัส</button>
                     <input type="file" id="import-image" accept="image/*" class="hidden" onchange="importFromImage(event)">
-                    <label for="import-image" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        📸 สแกนรูปภาพ
-                    </label>
+                    <label for="import-image" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer flex-1 sm:flex-none text-center">📸 AI อ่านภาพ</label>
                     <input type="file" id="import-file" accept=".csv, .xlsx, .xls, .pdf" class="hidden" onchange="importData(event)">
-                    <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        📥 นำเข้าไฟล์
-                    </label>
-                    <button onclick="deleteAllStudents()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        🗑️ ล้างทั้งหมด
-                    </button>
-                    
-                    <button onclick="forceSyncFromCloud()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition inline-flex items-center justify-center gap-1 flex-1 sm:flex-none">
-                        🔄 ดึงข้อมูลคลาวด์
-                    </button>
-
+                    <label for="import-file" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition cursor-pointer flex-1 sm:flex-none text-center">📥 นำเข้าไฟล์</label>
+                    <button onclick="deleteAllStudents()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition flex-1 sm:flex-none">🗑️ ล้างทั้งหมด</button>
+                    <button onclick="forceSyncFromCloud()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 px-3 py-2 rounded-xl text-sm font-medium shadow-sm transition flex-1 sm:flex-none">🔄 ดึงข้อมูลคลาวด์</button>
                 </div>
             </div>
 
+            <!-- TAB 1: เช็คชื่อ -->
             <section id="attendance-tab" class="tab-content space-y-6">
                 <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+                    <div class="p-6 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-50/50">
                         <div>
-                            <h3 class="font-semibold text-lg text-slate-900 flex items-center gap-2">
+                            <h3 class="font-semibold text-lg text-slate-900 flex flex-wrap items-center gap-2 mb-2">
                                 บันทึกการเข้าเรียน
-                                <button onclick="markAllPresent()" class="text-xs bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1 rounded-full font-medium transition border border-emerald-200 shadow-sm">✅ ติ๊กมาทุกคน</button>
+                                
+                                <!-- 🌟 ปุ่มเปิดกล้องสแกน 🌟 -->
+                                <button onclick="openScanner()" class="text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-full font-medium transition shadow-md flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0v-3Zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5ZM.5 16a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 1 0V15h2.5a.5.5 0 0 1 0 1h-3Zm12 0a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 1 0V15h2.5a.5.5 0 0 1 0 1h-3Z"/><path d="M3 3h10v10H3V3Zm2 2v6h6V5H5Z"/></svg> 
+                                    เปิดกล้องสแกน
+                                </button>
+                                
+                                <!-- 🌟 ช่องพิมพ์รหัสด้วยตัวเอง / รองรับเครื่องยิงบาร์โค้ด USB 🌟 -->
+                                <input type="text" id="manual-scan-input" placeholder="พิมพ์รหัสแล้ว Enter..." onkeypress="if(event.key === 'Enter') handleManualScan(this)" class="text-sm border border-slate-300 rounded-full px-4 py-1.5 w-44 md:w-56 outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner bg-white">
+                                
+                                <button onclick="markAllPresent()" class="text-sm bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-full font-medium transition border border-emerald-200 shadow-sm">✅ ติ๊กมาทุกคน</button>
                             </h3>
                             <input type="date" id="attendance-date" onchange="loadAttendance()" class="mt-2 border border-slate-200 rounded-xl px-4 py-2 outline-none text-slate-700">
                         </div>
-                        <button onclick="saveAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl shadow-sm transition w-full sm:w-auto">💾 บันทึกขึ้นคลาวด์</button>
+                        <button onclick="saveAttendance()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl shadow-sm transition w-full lg:w-auto">💾 บันทึกขึ้นคลาวด์</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -129,6 +139,7 @@
                 </div>
             </section>
 
+            <!-- TAB 2: เก็บคะแนน -->
             <section id="score-tab" class="tab-content hidden space-y-6">
                 <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                     <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -149,6 +160,7 @@
                 </div>
             </section>
 
+            <!-- TAB 3: รายงานผล -->
             <section id="report-tab" class="tab-content hidden space-y-6">
                 <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col lg:flex-row justify-between items-center gap-4">
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
@@ -162,12 +174,8 @@
                         </select>
                     </div>
                     <div class="flex gap-2 w-full lg:w-auto">
-                        <button onclick="exportToExcel()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2">
-                            📊 โหลด Excel
-                        </button>
-                        <button onclick="exportToPDF()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2">
-                            📄 โหลด PDF
-                        </button>
+                        <button onclick="exportToExcel()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2">📊 โหลด Excel</button>
+                        <button onclick="exportToPDF()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md transition flex items-center justify-center gap-2">📄 โหลด PDF</button>
                     </div>
                 </div>
                 
@@ -187,17 +195,34 @@
             </section>
         </main>
 
+        <!-- 🌟 Modal สำหรับสแกนกล้อง QR/Barcode 🌟 -->
+        <div id="scanner-modal" class="fixed inset-0 bg-slate-900/90 flex justify-center items-center z-[150] hidden backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl w-full max-w-md mx-4 shadow-2xl">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-xl font-bold text-indigo-700">📷 กล้องสแกนบัตร</h3>
+                    <button onclick="closeScanner()" class="bg-rose-100 text-rose-600 hover:bg-rose-200 px-3 py-1 rounded-lg font-bold transition">ปิด X</button>
+                </div>
+                <div id="qr-reader" class="w-full rounded-lg overflow-hidden border-2 border-indigo-100"></div>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-slate-600">ส่องบาร์โค้ด หรือ QR Code ให้อยู่ในกรอบ</p>
+                    <p class="text-xs text-rose-500 mt-1">⚠️ เสร็จแล้วอย่าลืมกด "บันทึกขึ้นคลาวด์" ด้วยนะครับ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay สร้างวิชา -->
         <div id="no-course-overlay" class="fixed inset-0 bg-slate-900/90 flex justify-center items-center z-40 hidden">
             <div class="bg-white p-8 rounded-2xl text-center max-w-md w-full shadow-2xl mx-4">
                 <h2 class="text-2xl font-bold mb-4 text-slate-800">ClassroomOS Pro</h2>
                 <p class="text-slate-500 mb-6">กรุณาสร้างห้องเรียน หรือวิชาแรกของคุณเพื่อเริ่มต้นครับ</p>
-                <button onclick="createNewCourse()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-indigo-700 transition shadow-lg">
-                    + สร้างห้อง/รายวิชา
-                </button>
+                <button onclick="createNewCourse()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-indigo-700 transition shadow-lg">+ สร้างห้อง/รายวิชา</button>
             </div>
         </div>
 
-    </div> <div id="cloud-loader" class="fixed inset-0 bg-white/90 flex flex-col justify-center items-center z-50 hidden backdrop-blur-sm">
+    </div> <!-- ปิด app-container -->
+
+    <!-- โหลดเดอร์ -->
+    <div id="cloud-loader" class="fixed inset-0 bg-white/90 flex flex-col justify-center items-center z-50 hidden backdrop-blur-sm">
         <div id="loader-icon" class="text-5xl mb-4 spin">⏳</div>
         <h2 id="loader-title" class="text-xl font-bold text-indigo-700">กำลังประมวลผล...</h2>
         <p id="loader-desc" class="text-slate-500 text-sm mt-2">กรุณารอสักครู่</p>
@@ -205,10 +230,25 @@
 
     <script>
         // ========================================================
-        // ⚙️ 1. ตั้งรหัสผ่านหน้าเว็บ & ลิงก์ Sheets
+        // ⚙️ ตั้งรหัสผ่านหน้าเว็บ & ลิงก์ Sheets
         // ========================================================
-        const MASTER_PASS = "123456"; // <-- แก้ไขรหัสผ่านตรงนี้ได้เลยครับ
+        const MASTER_PASS = "123456"; 
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyr2UnISJZhyD4hQ3gP2cRSMVYBo407RU0cVHGQ_6Dfoxm56eh1amkAvhCojVJGfIDe/exec';
+
+        // --- ระบบเสียง Beep ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(frequency, duration, type='sine') {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.value = frequency;
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            setTimeout(() => { oscillator.stop(); }, duration);
+        }
 
         // --- ระบบล็อกอิน ---
         function checkLogin() {
@@ -218,17 +258,13 @@
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
                 initApp(true);
-            } else {
-                showToast("❌ รหัสผ่านไม่ถูกต้อง", true);
-            }
+            } else showToast("❌ รหัสผ่านไม่ถูกต้อง", true);
         }
 
         function doLogout() {
-            sessionStorage.removeItem('is_logged_in');
-            window.location.reload();
+            sessionStorage.removeItem('is_logged_in'); window.location.reload();
         }
 
-        // โหลดแอปครั้งแรก ตรวจสอบล็อกอิน
         window.onload = function() {
             if (sessionStorage.getItem('is_logged_in') === 'true') {
                 document.getElementById('login-screen').classList.add('hidden');
@@ -237,7 +273,7 @@
             }
         };
 
-        // --- ฟังก์ชันพื้นฐาน ---
+        // --- พื้นฐาน ---
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast'); toast.textContent = msg;
             toast.className = `fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl transition-all duration-300 z-[100] transform translate-y-0 font-medium text-white ${isError ? 'bg-rose-600' : 'bg-emerald-600'}`;
@@ -270,27 +306,22 @@
 
         function updateSyncUI(status) {
             const ui = document.getElementById('sync-status');
-            if(status === 'syncing') { ui.innerHTML = `<span class="spin inline-block">⏳</span> กำลังซิงค์...`; ui.className = "text-xs font-medium text-amber-400 flex items-center gap-1 hidden sm:flex"; }
-            else if(status === 'success') { ui.innerHTML = `☁️ ซิงค์แล้ว`; ui.className = "text-xs font-medium text-emerald-400 flex items-center gap-1 hidden sm:flex"; }
-            else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 flex items-center gap-1 hidden sm:flex"; }
+            if(status === 'syncing') { ui.innerHTML = `<span class="spin inline-block">⏳</span> กำลังซิงค์...`; ui.className = "text-xs font-medium text-amber-400 hidden sm:flex items-center gap-1"; }
+            else if(status === 'success') { ui.innerHTML = `☁️ ซิงค์แล้ว`; ui.className = "text-xs font-medium text-emerald-400 hidden sm:flex items-center gap-1"; }
+            else if(status === 'error') { ui.innerHTML = `⚠️ ข้อมูลออฟไลน์`; ui.className = "text-xs font-medium text-rose-400 hidden sm:flex items-center gap-1"; }
         }
 
         async function forceSyncFromCloud() {
             if(!SCRIPT_URL) return; showLoader("กำลังดึงข้อมูลคลาวด์...", "ซิงค์กับ Google Sheets");
             try {
-                const response = await fetch(SCRIPT_URL);
-                const cloudData = await response.json();
+                const response = await fetch(SCRIPT_URL); const cloudData = await response.json();
                 if (cloudData && typeof cloudData === 'object') {
-                    for (let key in cloudData) {
-                        if (cloudData[key]) localStorage.setItem(key, JSON.stringify(cloudData[key]));
-                    }
+                    for (let key in cloudData) if (cloudData[key]) localStorage.setItem(key, JSON.stringify(cloudData[key]));
                 }
-                courses = safeParse('sys_courses', []);
-                currentCourseId = localStorage.getItem('sys_activeCourse') || (courses.length > 0 ? courses[0].id : null);
+                courses = safeParse('sys_courses', []); currentCourseId = localStorage.getItem('sys_activeCourse') || (courses.length > 0 ? courses[0].id : null);
                 if(currentCourseId) localStorage.setItem('sys_activeCourse', currentCourseId);
                 initApp(false); updateSyncUI('success');
-            } catch (error) { updateSyncUI('error'); showToast('ไม่สามารถเชื่อมต่อ Cloud ได้', true);
-            } finally { hideLoader(); }
+            } catch (error) { updateSyncUI('error'); showToast('ไม่สามารถเชื่อมต่อ Cloud ได้', true); } finally { hideLoader(); }
         }
 
         function saveToCloud(key, data) {
@@ -301,47 +332,33 @@
 
         function saveData(key, data) {
             if(!currentCourseId) return;
-            localStorage.setItem(`${key}_${currentCourseId}`, JSON.stringify(data));
-            saveToCloud(`${key}_${currentCourseId}`, data);
+            localStorage.setItem(`${key}_${currentCourseId}`, JSON.stringify(data)); saveToCloud(`${key}_${currentCourseId}`, data);
         }
 
-        function saveGlobalData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-            saveToCloud(key, data);
-        }
+        function saveGlobalData(key, data) { localStorage.setItem(key, JSON.stringify(data)); saveToCloud(key, data); }
 
         function initApp(checkCloudFirst = true) {
-            courses = safeParse('sys_courses', []);
-            document.getElementById('attendance-date').valueAsDate = new Date();
-            
+            courses = safeParse('sys_courses', []); document.getElementById('attendance-date').valueAsDate = new Date();
             if (checkCloudFirst && SCRIPT_URL && courses.length === 0) { forceSyncFromCloud(); return; }
-            
             if (courses.length === 0) {
                 document.getElementById('no-course-overlay').classList.remove('hidden'); document.getElementById('main-content').classList.add('hidden');
             } else {
                 document.getElementById('no-course-overlay').classList.add('hidden'); document.getElementById('main-content').classList.remove('hidden');
-                
-                if(!currentCourseId || !courses.find(c => c.id === currentCourseId)) {
-                    currentCourseId = courses[0].id; localStorage.setItem('sys_activeCourse', currentCourseId);
-                }
+                if(!currentCourseId || !courses.find(c => c.id === currentCourseId)) { currentCourseId = courses[0].id; localStorage.setItem('sys_activeCourse', currentCourseId); }
                 updateCourseDropdown(); loadDataForCurrentCourse();
             }
         }
 
         function updateCourseDropdown() {
             const selector = document.getElementById('course-selector'); selector.innerHTML = '';
-            courses.forEach(c => {
-                const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name;
-                if(c.id === currentCourseId) opt.selected = true; selector.appendChild(opt);
-            });
+            courses.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; if(c.id === currentCourseId) opt.selected = true; selector.appendChild(opt); });
             document.getElementById('display-course-name').textContent = `(${courses.find(c=>c.id===currentCourseId)?.name})`;
         }
 
         function createNewCourse() {
-            const name = prompt("ชื่อห้อง/รายวิชา (เช่น โฮมรูม ปวช.2):");
+            const name = prompt("ชื่อห้อง/รายวิชา:");
             if(name && name.trim() !== '') {
-                courses.push({ id: 'course_' + Date.now(), name: name.trim() });
-                saveGlobalData('sys_courses', courses); currentCourseId = courses[courses.length-1].id;
+                courses.push({ id: 'course_' + Date.now(), name: name.trim() }); saveGlobalData('sys_courses', courses); currentCourseId = courses[courses.length-1].id;
                 localStorage.setItem('sys_activeCourse', currentCourseId); initApp(false); showToast(`สร้างวิชา ${name} สำเร็จ!`);
             }
         }
@@ -350,9 +367,7 @@
             if (!currentCourseId || courses.length === 0) return; const courseIndex = courses.findIndex(c => c.id === currentCourseId);
             if (courseIndex > -1) {
                 const currentName = courses[courseIndex].name; const newName = prompt("แก้ไขชื่อห้อง/รายวิชา:", currentName);
-                if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
-                    courses[courseIndex].name = newName.trim(); saveGlobalData('sys_courses', courses); updateCourseDropdown(); showToast(`เปลี่ยนชื่อวิชาสำเร็จ!`);
-                }
+                if (newName && newName.trim() !== '' && newName.trim() !== currentName) { courses[courseIndex].name = newName.trim(); saveGlobalData('sys_courses', courses); updateCourseDropdown(); showToast(`เปลี่ยนชื่อวิชาสำเร็จ!`); }
             }
         }
 
@@ -361,11 +376,8 @@
         function loadDataForCurrentCourse() {
             students = safeParse(`students_${currentCourseId}`, []); attendanceData = safeParse(`attendance_${currentCourseId}`, {});
             tasks = safeParse(`tasks_${currentCourseId}`, []); scores = safeParse(`scores_${currentCourseId}`, {}); remarksData = safeParse(`remarks_${currentCourseId}`, {});
-            
             document.querySelectorAll('.tab-content').forEach(el => {
-                if(!el.classList.contains('hidden')) {
-                    if(el.id === 'attendance-tab') loadAttendance(); if(el.id === 'score-tab') renderScoreTable(); if(el.id === 'report-tab') generateReport();
-                }
+                if(!el.classList.contains('hidden')) { if(el.id === 'attendance-tab') loadAttendance(); if(el.id === 'score-tab') renderScoreTable(); if(el.id === 'report-tab') generateReport(); }
             });
         }
 
@@ -392,7 +404,7 @@
 
         function addStudentManual() {
             if(!currentCourseId) return showToast("กรุณาสร้างวิชาก่อน", true);
-            const newId = prompt("ใส่ 'รหัสประจำตัว' (เช่น 680001):"); if (!newId || newId.trim() === "") return;
+            const newId = prompt("ใส่ 'รหัสประจำตัว':"); if (!newId || newId.trim() === "") return;
             if (students.find(s => s.id === newId.trim())) return showToast("รหัสนี้มีในระบบแล้ว!", true);
             const newName = prompt("ใส่ 'ชื่อ-นามสกุล' :"); if (!newName || newName.trim() === "") return;
             students.push({ id: newId.trim(), name: newName.trim() }); saveData('students', students); loadAttendance(); showToast(`เพิ่มรายชื่อสำเร็จ!`);
@@ -435,6 +447,7 @@
             }
         }
 
+        // --- ระบบเช็คชื่อ ---
         function loadAttendance() {
             const date = document.getElementById('attendance-date').value; const tbody = document.getElementById('attendance-list'); tbody.innerHTML = '';
             if (students.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อ</td></tr>'; return; }
@@ -458,6 +471,77 @@
         function markAllPresent() { const date = document.getElementById('attendance-date').value; if (!date) return; if (!attendanceData[date]) attendanceData[date] = {}; let count = 0; students.forEach(s => { if (!attendanceData[date][s.id]) { attendanceData[date][s.id] = 'present'; count++; } }); loadAttendance(); showToast(`✅ ติ๊กมาเรียนให้ ${count} คน สำเร็จ`); }
         function saveAttendance() { const date = document.getElementById('attendance-date').value; if (!date) return; if (!attendanceData[date]) attendanceData[date] = {}; let unmarked = 0; students.forEach(s => { if (!attendanceData[date][s.id]) unmarked++; }); if (unmarked > 0 && !confirm(`⚠️ มี ${unmarked} คน ยังไม่ได้เช็คชื่อ บันทึกแค่นี้ใช่หรือไม่?`)) return; saveData('attendance', attendanceData); saveData('remarks', remarksData); showToast('💾 บันทึกเช็คชื่อสำเร็จ!'); }
 
+        // 🌟 ฟังก์ชันพิมพ์รหัสเช็คชื่อ (Manual Input / เครื่องยิงบาร์โค้ด USB) 🌟
+        function handleManualScan(inputEle) {
+            if(!currentCourseId || students.length === 0) { inputEle.value = ''; return showToast("กรุณาเพิ่มรายชื่อนักเรียนก่อน", true); }
+            const scannedId = inputEle.value.trim();
+            if (!scannedId) return;
+            
+            const student = students.find(s => s.id === scannedId);
+            if (student) {
+                const date = document.getElementById('attendance-date').value;
+                if(!attendanceData[date]) attendanceData[date] = {};
+                attendanceData[date][student.id] = 'present';
+                
+                // เซฟลงเครื่องก่อน กันระบบกระตุกเวลายิงรัวๆ แล้วให้ครูกดเซฟคลาวด์ทีหลัง
+                localStorage.setItem(`attendance_${currentCourseId}`, JSON.stringify(attendanceData)); 
+                loadAttendance();
+                
+                showToast(`✅ เช็คชื่อ: ${student.name}`);
+                playBeep(800, 100);
+                
+                inputEle.value = ''; // เคลียร์ช่องให้พร้อมยิงคนต่อไป
+                inputEle.focus();
+            } else {
+                showToast(`❌ ไม่พบรหัส: ${scannedId}`, true);
+                playBeep(300, 300, 'square');
+                inputEle.select(); // คลุมดำข้อความเดิมให้พิมพ์ทับง่ายๆ
+            }
+        }
+
+        // 🌟 ฟังก์ชันกล้องสแกน QR/Barcode 🌟
+        let html5QrcodeScanner;
+        let lastScannedId = "";
+        let scanTimeout;
+
+        function openScanner() {
+            if(!currentCourseId || students.length === 0) return showToast("กรุณาเพิ่มรายชื่อนักเรียนก่อนเริ่มสแกน", true);
+            document.getElementById('scanner-modal').classList.remove('hidden');
+            html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
+
+        function closeScanner() {
+            document.getElementById('scanner-modal').classList.add('hidden');
+            if (html5QrcodeScanner) html5QrcodeScanner.clear().catch(error => { console.error("Failed to clear scanner. ", error); });
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            const scannedId = decodedText.trim();
+            if (scannedId === lastScannedId) return; // กันกล้องอ่านซ้ำรัวๆ
+            lastScannedId = scannedId;
+            clearTimeout(scanTimeout);
+            scanTimeout = setTimeout(() => { lastScannedId = ""; }, 2500);
+
+            const student = students.find(s => s.id === scannedId);
+            if (student) {
+                const date = document.getElementById('attendance-date').value;
+                if(!attendanceData[date]) attendanceData[date] = {};
+                attendanceData[date][student.id] = 'present';
+                localStorage.setItem(`attendance_${currentCourseId}`, JSON.stringify(attendanceData)); 
+                loadAttendance();
+                showToast(`✅ เช็คชื่อ: ${student.name}`);
+                playBeep(800, 100);
+            } else {
+                showToast(`❌ ไม่พบรหัส: ${scannedId}`, true);
+                playBeep(300, 300, 'square');
+            }
+        }
+
+        function onScanFailure(error) { /* ไม่ต้องทำอะไร ปล่อยให้มันสแกนต่อไป */ }
+
+
+        // --- SCORES ---
         function addNewTask() { const taskName = prompt("ชื่อช่องคะแนน:"); if (!taskName) return; const maxScore = prompt("คะแนนเต็ม?:", "10"); if (!maxScore || isNaN(maxScore)) return; tasks.push({ id: 'task_' + Date.now(), name: taskName, maxScore: parseFloat(maxScore) }); saveData('tasks', tasks); renderScoreTable(); showToast('เพิ่มช่องคะแนนสำเร็จ'); }
         function removeTask(taskId) { if(confirm('ลบช่องคะแนนนี้?')) { tasks = tasks.filter(t => t.id !== taskId); Object.keys(scores).forEach(sId => { if(scores[sId]) delete scores[sId][taskId]; }); saveData('tasks', tasks); saveData('scores', scores); renderScoreTable(); showToast('ลบสำเร็จ'); } }
         function renderScoreTable() {
@@ -473,6 +557,7 @@
         }
         function updateScore(studentId, taskId, value, max) { if (!scores[studentId]) scores[studentId] = {}; let numValue = value === '' ? '' : parseFloat(value); scores[studentId][taskId] = numValue; saveData('scores', scores); showToast('✅ เซฟคะแนนแล้ว'); }
 
+        // --- REPORTS ---
         function generateReport() {
             const filterType = document.getElementById('report-filter').value; const selectedDate = document.getElementById('report-date').value;
             const tbody = document.getElementById('report-list'); const theader = document.getElementById('report-table-header'); tbody.innerHTML = '';
