@@ -6,7 +6,7 @@
     <title>ClassroomOS Pro - Ultimate</title>
     <link rel="icon" href="https://bunharnpoly.ac.th/media/p1/img/VEC%20%E0%B8%9A%E0%B8%A3%E0%B8%A3%E0%B8%AB%E0%B8%B2%E0%B8%A3-%E0%B9%81%E0%B8%88%E0%B9%88%E0%B8%A1%E0%B9%83%E0%B8%AA.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
@@ -27,6 +27,7 @@
     
     <div id="toast" class="fixed bottom-5 right-5 px-6 py-3 rounded-xl shadow-2xl opacity-0 pointer-events-none z-[500] transform translate-y-4 font-medium text-white transition-all duration-300"></div>
 
+    <!-- Login -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900/95 flex justify-center items-center z-[200] backdrop-blur-sm">
         <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4 border border-slate-100 text-center">
             <img src="https://bunharnpoly.ac.th/media/p1/img/VEC%20%E0%B8%9A%E0%B8%A3%E0%B8%A3%E0%B8%AB%E0%B8%B2%E0%B8%A3-%E0%B9%81%E0%B8%88%E0%B9%88%E0%B8%A1%E0%B9%83%E0%B8%AA.png" alt="App Logo" class="w-24 h-24 mx-auto mb-5 rounded-2xl shadow-lg border-4 border-indigo-50 object-contain bg-white">
@@ -37,8 +38,10 @@
         </div>
     </div>
 
+    <!-- App -->
     <div id="app-container" class="hidden">
         
+        <!-- แถบด้านบน: เลือกวิชา / ซิงค์ -->
         <div class="bg-slate-900 text-white px-6 py-2.5 text-sm flex flex-col md:flex-row justify-between items-center z-50 relative gap-3 md:gap-0 shadow-md">
             
             <div class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-lg border-2 border-indigo-400 w-full md:w-auto shadow-md">
@@ -61,6 +64,7 @@
             </div>
         </div>
 
+        <!-- แถบเมนูหลัก -->
         <nav class="bg-white border-b border-slate-200 px-5 py-3 sticky top-0 z-40 shadow-sm">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
                 <div class="flex items-center space-x-2 w-full md:w-auto justify-center md:justify-start">
@@ -69,12 +73,17 @@
                 </div>
                 <div class="flex space-x-1.5 bg-slate-100 p-1 rounded-xl overflow-x-auto w-full md:w-auto justify-start md:justify-center hide-scrollbar">
                     <button onclick="switchTab('home-tab')" id="btn-home" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap">🏠 หน้าหลัก</button>
+                    
                     <button onclick="switchTab('rooms-tab')" id="btn-rooms" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap ml-1 shadow-sm">🗂️ ห้องเรียน</button>
+                    
+                    <button onclick="switchTab('library-tab')" id="btn-library" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap ml-1 shadow-sm">🏢 วิทยบริการ</button>
+
                     <button onclick="switchTab('students-tab')" id="btn-students" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">📋 รายชื่อ (ในวิชา)</button>
                     <button onclick="switchTab('attendance-tab')" id="btn-attendance" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">⏰ เช็คชื่อ</button>
                     <button onclick="switchTab('score-tab')" id="btn-score" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">💯 คะแนน</button>
                     <button onclick="switchTab('report-tab')" id="btn-report" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">📊 รายงาน</button>
                     <button onclick="switchTab('grade-tab')" id="btn-grade" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">🅰️ ตัดเกรด</button>
+                    
                     <button onclick="switchTab('group-tab')" id="btn-group" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">👥 จัดกลุ่ม</button>
                     <button onclick="openRandomModal()" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 whitespace-nowrap ml-1 shadow-sm">🎲 สุ่มตอบ</button>
                 </div>
@@ -83,6 +92,7 @@
 
         <main class="max-w-7xl mx-auto p-4 md:p-6" id="main-content">
             
+            <!-- TAB: หน้าแดชบอร์ด -->
             <section id="home-tab" class="tab-content space-y-6">
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-5 md:p-6 shadow-lg text-white flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
                     <div class="absolute -right-5 -top-5 opacity-20 text-7xl">🏫</div>
@@ -103,7 +113,7 @@
 
                 <div>
                     <h3 class="text-base md:text-lg font-bold text-slate-800 mb-3 flex items-center gap-2"><span class="text-lg">⚡</span> เมนูด่วน</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 md:gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4">
                         <button onclick="forceSyncFromCloud()" class="admin-only bg-gradient-to-br from-indigo-50 to-blue-50 p-3 md:p-4 rounded-xl shadow-sm border border-indigo-200 hover:-translate-y-1 hover:border-indigo-400 transition-all text-center md:text-left group flex flex-col items-center md:items-start col-span-2 md:col-span-1 lg:col-span-1">
                             <div class="bg-white text-indigo-600 w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center text-xl md:text-2xl mb-2 group-hover:scale-110 transition shadow-sm">🔄</div>
                             <h4 class="font-bold text-indigo-800 text-xs md:text-sm w-full text-center md:text-left">ดึงคลาวด์</h4>
@@ -112,6 +122,10 @@
                         <button onclick="switchTab('rooms-tab')" class="admin-only bg-emerald-50 p-3 md:p-4 rounded-xl shadow-sm border border-emerald-200 hover:-translate-y-1 hover:border-emerald-400 transition-all text-center md:text-left group flex flex-col items-center md:items-start">
                             <div class="bg-white text-emerald-600 w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center text-xl md:text-2xl mb-2 group-hover:scale-110 transition shadow-sm">🗂️</div>
                             <h4 class="font-bold text-emerald-800 text-xs md:text-sm w-full text-center md:text-left">ฐานข้อมูลห้อง</h4>
+                        </button>
+                        <button onclick="switchTab('library-tab')" class="admin-only bg-blue-50 p-3 md:p-4 rounded-xl shadow-sm border border-blue-200 hover:-translate-y-1 hover:border-blue-400 transition-all text-center md:text-left group flex flex-col items-center md:items-start">
+                            <div class="bg-white text-blue-600 w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center text-xl md:text-2xl mb-2 group-hover:scale-110 transition shadow-sm">🏢</div>
+                            <h4 class="font-bold text-blue-800 text-xs md:text-sm w-full text-center md:text-left">วิทยบริการ</h4>
                         </button>
                         <button onclick="switchTab('attendance-tab')" class="bg-white p-3 md:p-4 rounded-xl shadow-sm border border-slate-100 hover:-translate-y-1 hover:border-indigo-300 transition-all text-center md:text-left group flex flex-col items-center md:items-start">
                             <div class="bg-indigo-50 text-indigo-600 w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center text-xl md:text-2xl mb-2 group-hover:scale-110 transition">⏰</div>
@@ -137,6 +151,89 @@
                 </div>
             </section>
 
+            <!-- 🌟 TAB: ระบบห้องวิทยบริการ 🌟 -->
+            <section id="library-tab" class="tab-content hidden space-y-6">
+                <h1 class="text-2xl font-bold text-gray-800 text-center md:text-left border-b pb-3 border-gray-300">
+                    🏢 ระบบบันทึกและสรุปผลข้อมูลห้องวิทยบริการ
+                </h1>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between lg:col-span-1">
+                        <div>
+                            <h2 class="text-base font-bold text-green-700 mb-2 flex items-center border-b pb-2">📂 นำเข้าไฟล์ดิบ Excel (.xlsx)</h2>
+                            <p class="text-[10px] text-gray-500 mb-4">*ระบบจะนับเฉพาะคนที่มีข้อมูลสมบูรณ์ แถวที่ <strong>"ไม่พบชื่อในฐานข้อมูล"</strong> จะถูกตัดออกให้อัตโนมัติ</p>
+                        </div>
+                        <div id="lib-drop-zone" class="border-2 border-dashed border-green-300 rounded-xl p-6 text-center bg-green-50 hover:bg-green-100 hover:border-green-500 transition cursor-pointer">
+                            <p class="text-green-700 font-semibold text-xs mb-1">📥 โยนไฟล์ Excel วางที่นี่</p>
+                            <p class="text-[10px] text-gray-400">หรือคลิกเพื่อเลือกไฟล์</p>
+                            <input type="file" id="lib-excel-file" accept=".xlsx, .xls, .csv" class="hidden" />
+                        </div>
+                        <div id="lib-upload-status" class="text-[10px] font-semibold mt-3 p-2 rounded hidden space-y-1"></div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 lg:col-span-2">
+                        <h2 class="text-base font-bold text-blue-700 mb-3 flex items-center border-b pb-2">📝 กรอก/แก้ไขข้อมูลด้วยตนเอง (กรณีจดสมุด)</h2>
+                        <div class="flex flex-col sm:flex-row gap-2 mb-4 items-center bg-blue-50 p-2.5 rounded-lg">
+                            <label class="font-semibold text-[10px] text-gray-700 whitespace-nowrap">เลือกวันที่ต้องการจัดการ :</label>
+                            <input type="date" id="lib-entry-date" class="border border-gray-300 rounded-md p-1.5 text-xs focus:ring-blue-500 focus:border-blue-500 bg-white" onchange="loadLibEntryData()">
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <div><label class="block text-[10px] font-medium text-gray-600">เทคโนโลยีธุรกิจดิจิทัล</label><input type="number" id="lib-v-0" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">ช่างยนต์</label><input type="number" id="lib-v-1" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">ช่างกลโรงงาน</label><input type="number" id="lib-v-2" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">ช่างไฟฟ้า</label><input type="number" id="lib-v-3" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">ช่างเชื่อมโลหะ</label><input type="number" id="lib-v-4" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">ช่างอิเล็กทรอนิกส์</label><input type="number" id="lib-v-5" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">การบัญชี</label><input type="number" id="lib-v-6" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                            <div><label class="block text-[10px] font-medium text-gray-600">การดนตรี</label><input type="number" id="lib-v-7" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-1.5 text-center text-xs"></div>
+                        </div>
+                        <div class="mt-4 flex items-center gap-3">
+                            <button onclick="saveLibEntryData()" class="bg-blue-600 text-white font-semibold px-4 py-1.5 rounded-md shadow hover:bg-blue-700 transition text-xs">💾 บันทึกข้อมูลของวันนี้</button>
+                            <span id="lib-save-status" class="text-xs font-semibold text-green-600 hidden">✓ บันทึกสำเร็จ!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                    <h2 class="text-lg font-bold text-purple-700 mb-4 flex items-center border-b pb-2">📊 รายงานผลและการคำนวณร้อยละ</h2>
+                    <div class="flex flex-col md:flex-row gap-3 mb-5 bg-purple-50 p-3 rounded-lg items-center text-xs">
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">รูปแบบสรุป:</label>
+                            <select id="lib-report-type" class="border border-gray-300 rounded-md p-1.5 bg-white outline-none" onchange="updateLibReport()">
+                                <option value="daily">รายวัน (Daily)</option>
+                                <option value="weekly">รายสัปดาห์ (Weekly)</option>
+                                <option value="monthly">รายเดือน (Monthly)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="font-semibold text-gray-700">อ้างอิงวันที่:</label>
+                            <input type="date" id="lib-report-date" class="border border-gray-300 rounded-md p-1.5 bg-white outline-none" onchange="updateLibReport()">
+                        </div>
+                        <button onclick="clearLibDatabase()" class="ml-auto bg-red-100 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-200 font-semibold transition">🗑️ ล้างข้อมูลระบบทั้งหมด</button>
+                    </div>
+
+                    <div class="mb-4"><h3 id="lib-report-title" class="text-sm font-bold text-gray-800 text-center bg-gray-50 py-2 rounded">กำลังประมวลผล...</h3></div>
+                    <div class="mt-4"><canvas id="lib-major-chart" height="90"></canvas></div>
+
+                    <div class="mt-6 overflow-x-auto">
+                        <table class="w-full text-left border-collapse border border-gray-200 text-xs">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-700"><th class="border border-gray-200 p-2.5 font-semibold">สาขาวิชา</th><th class="border border-gray-200 p-2.5 font-semibold text-center">จำนวน (คน)</th><th class="border border-gray-200 p-2.5 font-semibold text-center">คิดเป็นร้อยละ (%)</th></tr>
+                            </thead>
+                            <tbody id="lib-table-body" class="divide-y divide-gray-200"></tbody>
+                            <tfoot>
+                                <tr class="bg-purple-100 font-bold text-purple-800">
+                                    <td class="border border-gray-200 p-2.5 text-right">รวมผู้เข้าใช้บริการทั้งหมด</td>
+                                    <td id="lib-total-count" class="border border-gray-200 p-2.5 text-center">0</td>
+                                    <td class="border border-gray-200 p-2.5 text-center">100.00 %</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: จัดการห้องเรียนหลัก -->
             <section id="rooms-tab" class="tab-content hidden space-y-5">
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl shadow-sm overflow-hidden mb-5">
                     <div class="bg-emerald-700 text-white px-5 py-3 flex flex-col md:flex-row justify-between items-center gap-3">
@@ -174,6 +271,7 @@
                 </div>
             </section>
 
+            <!-- TAB: จัดการรายชื่อ (ในวิชา) -->
             <section id="students-tab" class="tab-content hidden space-y-5">
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
@@ -186,7 +284,6 @@
                                 <span class="text-[10px] text-emerald-700 font-bold">🔗 ซิงค์กับ: <span id="linked-room-name"></span></span>
                                 <button onclick="unlinkRoom()" class="text-rose-500 hover:text-rose-700 text-[9px] font-bold px-1">[ยกเลิก]</button>
                             </div>
-
                             <button onclick="openPullRoomModal()" class="admin-only bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-md animate-pulse">📥 ดึงจากห้องหลัก (Auto-Sync)</button>
                             <button onclick="openCopy()" class="admin-only bg-fuchsia-600 hover:bg-fuchsia-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-sm">📋 คัดลอกวิชาอื่น</button>
                             <button onclick="addStudentManual()" class="admin-only bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium">➕ เพิ่ม</button>
@@ -207,6 +304,7 @@
                 </div>
             </section>
 
+            <!-- TAB 1: เช็คชื่อ -->
             <section id="attendance-tab" class="tab-content hidden space-y-5">
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-50/50">
@@ -228,6 +326,7 @@
                 </div>
             </section>
 
+            <!-- TAB 2: เก็บคะแนน -->
             <section id="score-tab" class="tab-content hidden space-y-5">
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
@@ -240,6 +339,7 @@
                 </div>
             </section>
 
+            <!-- TAB 3: รายงานผล -->
             <section id="report-tab" class="tab-content hidden space-y-5">
                 <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-sm">
                     <div class="flex flex-col sm:flex-row items-center gap-2 text-sm w-full md:w-auto">
@@ -250,7 +350,7 @@
                                 <option value="term">ทั้งหมด</option><option value="daily">รายวัน</option><option value="weekly">7 วันล่าสุด</option><option value="monthly">เดือนนี้</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2 ml-0 sm:ml-2 mt-2 sm:mt-0 w-full sm:w-auto">
+                        <div class="flex items-center gap-2 ml-0 sm:ml-2 mt-2 sm:mt-0 w-full sm:w-auto border-l-0 sm:border-l border-indigo-200 pl-0 sm:pl-2">
                             <span class="font-semibold text-indigo-800 text-[10px] md:text-xs whitespace-nowrap">✍️ ลงชื่อ:</span>
                             <input type="text" class="teacher-name-input border border-indigo-200 rounded-md px-2 py-1 shadow-sm w-full sm:w-36 outline-none focus:ring-1 focus:ring-indigo-500 text-xs font-bold text-indigo-700 bg-white" placeholder="ชื่อผู้สอน..." onchange="saveTeacherName(this.value)">
                         </div>
@@ -269,6 +369,7 @@
                 </div>
             </section>
 
+            <!-- TAB 4: ตัดเกรด -->
             <section id="grade-tab" class="tab-content hidden space-y-5">
                 <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shadow-sm">
                     <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full md:w-auto">
@@ -301,6 +402,7 @@
                 </div>
             </section>
 
+            <!-- TAB 5: จัดกลุ่ม -->
             <section id="group-tab" class="tab-content hidden space-y-5">
                 <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
@@ -324,10 +426,12 @@
             </section>
         </main>
 
+        <!-- Overlay สร้างวิชาแรก -->
         <div id="no-course-overlay" class="fixed inset-0 bg-slate-900/90 flex justify-center items-center z-40 hidden">
             <div class="bg-white p-6 rounded-xl text-center max-w-sm w-full mx-4"><h2 class="text-xl font-bold mb-3">ClassroomOS Pro</h2><p class="text-slate-500 text-sm mb-5">สร้างวิชาแรกเพื่อเริ่มต้นครับ</p><button onclick="createNewCourse()" class="bg-indigo-600 text-white px-4 py-2.5 rounded-lg font-bold w-full text-sm shadow-lg">+ สร้างห้อง/รายวิชา</button></div>
         </div>
         
+        <!-- Modal ดึงรายชื่อจากห้อง -->
         <div id="pull-room-modal" class="fixed inset-0 bg-slate-900/80 flex justify-center items-center z-[150] hidden backdrop-blur-sm">
             <div class="bg-white p-5 rounded-2xl text-center max-w-xs w-full shadow-2xl mx-4 transform scale-95 transition-transform duration-300 border-4 border-indigo-50" id="pull-room-modal-content">
                 <div class="text-4xl mb-1">📥</div>
@@ -341,6 +445,7 @@
             </div>
         </div>
 
+        <!-- Modal คัดลอกวิชาเก่า -->
         <div id="copy-modal" class="fixed inset-0 bg-slate-900/80 flex justify-center items-center z-[150] hidden backdrop-blur-sm">
             <div class="bg-white p-5 rounded-2xl text-center max-w-xs w-full shadow-2xl mx-4 transform scale-95 transition-transform duration-300 border-4 border-fuchsia-50" id="copy-modal-content">
                 <div class="text-4xl mb-1">📋</div>
@@ -354,6 +459,7 @@
             </div>
         </div>
 
+        <!-- Modal สุ่มนักเรียน -->
         <div id="random-modal" class="fixed inset-0 bg-slate-900/80 flex justify-center items-center z-[150] hidden backdrop-blur-sm">
             <div class="bg-white p-5 rounded-2xl text-center max-w-xs w-full shadow-2xl mx-4 transform scale-95 transition-transform duration-300 border-4 border-indigo-50 relative overflow-hidden" id="random-modal-content">
                 <div id="rnd-main">
@@ -392,6 +498,7 @@
         </div>
     </div> 
 
+    <!-- Loading Spinner -->
     <div id="cloud-loader" class="fixed inset-0 bg-white/90 flex flex-col justify-center items-center z-50 hidden backdrop-blur-sm">
         <div id="loader-icon" class="text-4xl mb-3 spin">⏳</div><h2 id="loader-title" class="text-lg font-bold text-indigo-700">กำลังประมวลผล...</h2><p id="loader-desc" class="text-slate-500 text-xs mt-1">รอสักครู่</p>
     </div>
@@ -402,6 +509,7 @@
         function pS(f,t,d,v=0.1,ty='sine'){if(aCtx.state==='suspended')aCtx.resume();let o=aCtx.createOscillator(),g=aCtx.createGain(),s=aCtx.currentTime+t;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(0.01,s+d);o.connect(g);g.connect(aCtx.destination);o.start(s);o.stop(s+d);}
         function sWin(){pS(523,0,0.2);pS(659,0.15,0.2);pS(784,0.3,0.2);pS(1046,0.45,0.8,0.2,'triangle');pS(523,0.45,0.8);}function sExp(){pS(988,0,0.1,0.05,'square');pS(1319,0.1,0.4,0.05,'square');}
         let hasUnsavedChanges=false;window.addEventListener('beforeunload',e=>{if(hasUnsavedChanges){e.preventDefault();e.returnValue='มีข้อมูลยังไม่ได้บันทึก ออกจากหน้านี้หรือไม่?';}});
+        
         function checkLogin(){const p=document.getElementById('login-password').value;if(p===MASTER_PASS||p===SCANNER_PASS){sessionStorage.setItem('is_logged_in','true');sessionStorage.setItem('user_role',p===MASTER_PASS?'admin':'scanner');document.getElementById('login-screen').classList.add('hidden');document.getElementById('app-container').classList.remove('hidden');initApp(true);if(p===SCANNER_PASS)showToast("🔒 โหมดนักเรียน");}else showToast("❌ รหัสผิด",true);}
         function doLogout(){if(hasUnsavedChanges&&!confirm("มีข้อมูลยังไม่เซฟ ยืนยันออก?"))return;sessionStorage.removeItem('is_logged_in');window.location.reload();}
         function applyRolePermissions(){const isAdmin=sessionStorage.getItem('user_role')==='admin';document.querySelectorAll('.admin-only').forEach(el=>isAdmin?el.classList.remove('hidden'):el.classList.add('hidden'));switchTab('home-tab');}
@@ -413,9 +521,10 @@
         
         let courses=[],students=[],attendanceData={},tasks=[],scores={},remarksData={},finalScores={},rndW={},rooms=[],roomStudents=[];
         let currentCourseId=localStorage.getItem('sys_activeCourse')||null, currentRoomId=localStorage.getItem('sys_activeRoom')||null;
-        
-        // 🌟 ตัวแปรเก็บชื่อครู (Signature) 🌟
         let teacherName = localStorage.getItem('sys_teacher_name') || '';
+
+        const libLabels = ['เทคโนโลยีธุรกิจดิจิทัล', 'ช่างยนต์', 'ช่างกลโรงงาน', 'ช่างไฟฟ้า', 'ช่างเชื่อมโลหะ', 'ช่างอิเล็กทรอนิกส์', 'การบัญชี', 'การดนตรี'];
+        let libChart = null;
 
         function updateSyncUI(s){const ui=document.getElementById('sync-status');if(s==='pending'){ui.innerHTML=`⏳ รอเซฟ...`;ui.className="text-[10px] font-medium text-amber-500 hidden lg:flex items-center gap-1";}else if(s==='syncing'){ui.innerHTML=`<span class="spin inline-block">⏳</span> กำลังซิงค์...`;ui.className="text-[10px] font-medium text-amber-400 hidden lg:flex items-center gap-1";}else if(s==='success'){ui.innerHTML=`☁️ ซิงค์แล้ว`;ui.className="text-[10px] font-medium text-emerald-400 hidden lg:flex items-center gap-1";}else if(s==='error'){ui.innerHTML=`⚠️ เน็ตหลุด`;ui.className="text-[10px] font-medium text-rose-500 hidden lg:flex items-center gap-1";}}
         async function saveToCloud(k,d,r=3){if(!SCRIPT_URL)return;updateSyncUI('syncing');try{const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'save',key:k,value:d})});const out=await res.json();if(out.status==='success'){hasUnsavedChanges=false;updateSyncUI('success');}else throw new Error();}catch(err){if(r>0)setTimeout(()=>saveToCloud(k,d,r-1),2000);else{updateSyncUI('error');showToast('⚠️ เซฟไม่ได้',true);}}}
@@ -423,10 +532,31 @@
         function saveGlobalData(k,d){hasUnsavedChanges=true; updateSyncUI('pending'); localStorage.setItem(k,JSON.stringify(d)); saveToCloud(k,d); updateDash();}
         function updateDash(){if(document.getElementById('dash-course-name')&&courses.length>0)document.getElementById('dash-course-name').textContent=(courses.find(c=>c.id===currentCourseId)||{}).name||'-';if(document.getElementById('dash-student-count'))document.getElementById('dash-student-count').textContent=(students?students.length:0)+' คน';if(document.getElementById('dash-date'))document.getElementById('dash-date').textContent=new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
         
-        // โหลดชื่อครูลงช่อง Input ตอนเริ่มแอป
         window.onload=function(){
             if(sessionStorage.getItem('is_logged_in')==='true'){document.getElementById('login-screen').classList.add('hidden');document.getElementById('app-container').classList.remove('hidden');initApp(true);}
             document.querySelectorAll('.teacher-name-input').forEach(el=>el.value=teacherName);
+            
+            // 🌟 🌟 ระบบ Auto-Migration ดึงข้อมูลวิทยบริการตัวเก่าเข้าสู่ตัวใหม่ 🌟 🌟
+            let oldDb = localStorage.getItem('library_db');
+            if(oldDb) {
+                try {
+                    let parsedOld = JSON.parse(oldDb);
+                    let currentNew = safeParse('sys_library_db', {});
+                    let hasMoved = false;
+                    for(let k in parsedOld) {
+                        if(!currentNew[k]) { currentNew[k] = parsedOld[k]; hasMoved = true; }
+                    }
+                    if(hasMoved) { 
+                        saveGlobalData('sys_library_db', currentNew);
+                        setTimeout(() => showToast('✅ กู้คืนข้อมูลวิทยบริการเก่าสำเร็จ!'), 1500);
+                    }
+                } catch(e){}
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('lib-entry-date').value = today;
+            document.getElementById('lib-report-date').value = today;
+            setupLibDragAndDrop();
         };
         
         function saveTeacherName(val) { teacherName = val; localStorage.setItem('sys_teacher_name', val); document.querySelectorAll('.teacher-name-input').forEach(el=>el.value=val); }
@@ -441,7 +571,6 @@
         function deleteCourse(){const i=courses.findIndex(c=>c.id===currentCourseId);if(i>-1){if(confirm(`ลบวิชา "${courses[i].name}" ถาวร?`)){courses.splice(i,1);saveGlobalData('sys_courses',courses);[`students_`,`attendance_`,`tasks_`,`scores_`,`remarks_`,`final_scores_`,`rndW_`,'course_link_'].forEach(p=>localStorage.removeItem(p+currentCourseId));currentCourseId=courses.length>0?courses[0].id:null;if(currentCourseId)localStorage.setItem('sys_activeCourse',currentCourseId);else localStorage.removeItem('sys_activeCourse');initApp(false);showToast(`ลบสำเร็จ`);}}}
         function changeCourse(){currentCourseId=document.getElementById('course-selector').value;localStorage.setItem('sys_activeCourse',currentCourseId);initApp(false);}
         
-        // 🌟 ระบบ Auto-Sync ทำงานตอนเปิดวิชา 🌟
         function syncLinkedRoom() {
             if(!currentCourseId) return;
             const linkId = localStorage.getItem('course_link_' + currentCourseId);
@@ -451,8 +580,8 @@
             let changed = false;
             rStds.forEach(rs => {
                 let s = students.find(x => x.id === rs.id);
-                if (s) { if (s.name !== rs.name) { s.name = rs.name; changed = true; } } // อัปเดตชื่อที่แก้
-                else { students.push({...rs}); changed = true; } // แอดคนใหม่
+                if (s) { if (s.name !== rs.name) { s.name = rs.name; changed = true; } }
+                else { students.push({...rs}); changed = true; }
             });
             if (changed) { saveData('students', students); showToast('🔗 อัปเดตรายชื่อจากห้องหลักอัตโนมัติ'); }
         }
@@ -466,8 +595,8 @@
 
         function loadDataForCurrentCourse(){
             students=safeParse(`students_${currentCourseId}`,[]);
-            syncLinkedRoom(); // 🌟 รัน Sync อัตโนมัติ 🌟
-            updateLinkedRoomUI(); // 🌟 อัปเดต UI 🌟
+            syncLinkedRoom(); 
+            updateLinkedRoomUI(); 
             attendanceData=safeParse(`attendance_${currentCourseId}`,{});tasks=safeParse(`tasks_${currentCourseId}`,[]);scores=safeParse(`scores_${currentCourseId}`,{});remarksData=safeParse(`remarks_${currentCourseId}`,{});finalScores=safeParse(`final_scores_${currentCourseId}`,{});rndW=safeParse(`rndW_${currentCourseId}`,{});
             updateDash();document.querySelectorAll('.tab-content').forEach(el=>{if(!el.classList.contains('hidden')){if(el.id==='students-tab')renderStudentList();if(el.id==='attendance-tab')loadAttendance();if(el.id==='score-tab')renderScoreTable();if(el.id==='report-tab')generateReport();if(el.id==='grade-tab')calculateGrades();}});
         }
@@ -485,7 +614,228 @@
         function clearRoomStd(){if(confirm("ล้างรายชื่อห้องนี้ทั้งหมด?")){roomStudents=[];saveData('students_room',roomStudents,true);renderRoomStudents();showToast("ล้างสำเร็จ");}}
         function sortRoomStd(){roomStudents.sort((a,b)=>{let nA=a.id.replace(/\D/g,''),nB=b.id.replace(/\D/g,'');return nA.length!==nB.length?nA.length-nB.length:nA.localeCompare(nB)||a.id.localeCompare(b.id,'th');});saveData('students_room',roomStudents,true);renderRoomStudents();showToast("จัดเรียงสำเร็จ!");}
 
-        function switchTab(id){document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.tab-btn').forEach(btn=>{btn.classList.remove('bg-white','text-indigo-600','shadow-sm','bg-emerald-50','text-emerald-700','border-emerald-200');btn.classList.add(btn.id==='btn-rooms'?'text-emerald-600':'text-slate-600');});const btn=document.getElementById('btn-'+id.replace('-tab',''));if(btn){if(id==='rooms-tab'){btn.classList.add('bg-emerald-50','text-emerald-700','border-emerald-200','shadow-sm');btn.classList.remove('text-emerald-600');}else{btn.classList.add('bg-white','text-indigo-600','shadow-sm');btn.classList.remove('text-slate-600');}}const mSection=document.querySelector('.hidden-in-home');if(mSection){if(id==='home-tab'||id==='group-tab'||id==='rooms-tab')mSection.classList.add('hidden');else mSection.classList.remove('hidden');}if(id==='home-tab')updateDash();if(id==='students-tab')renderStudentList();if(id==='attendance-tab')loadAttendance();if(id==='score-tab')renderScoreTable();if(id==='report-tab')generateReport();if(id==='grade-tab')calculateGrades();if(id==='rooms-tab'){if(!currentRoomId&&rooms.length===0)setTimeout(createRoom,300);else updateRoomDropdown();}}
+        function initLibChart() {
+            const ctx = document.getElementById('lib-major-chart').getContext('2d');
+            libChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: libLabels,
+                    datasets: [{
+                        label: 'ผู้เข้าใช้บริการ (คน)',
+                        data: [0,0,0,0,0,0,0,0],
+                        backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#14b8a6', '#8b5cf6', '#f97316', '#9ca3af', '#10b981'],
+                        borderRadius: 4
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function loadLibEntryData() {
+            const date = document.getElementById('lib-entry-date').value;
+            const db = safeParse('sys_library_db', {});
+            const data = db[date] || [0,0,0,0,0,0,0,0];
+            for(let i=0; i<8; i++) document.getElementById(`lib-v-${i}`).value = data[i];
+        }
+
+        function saveLibEntryData() {
+            const date = document.getElementById('lib-entry-date').value;
+            if(!date) return showToast("กรุณาเลือกวันที่", true);
+            let data = [];
+            for(let i=0; i<8; i++) data.push(Number(document.getElementById(`lib-v-${i}`).value) || 0);
+            const db = safeParse('sys_library_db', {});
+            db[date] = data;
+            saveGlobalData('sys_library_db', db);
+            const status = document.getElementById('lib-save-status');
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 2000);
+            updateLibReport();
+        }
+
+        function updateLibReport() {
+            const type = document.getElementById('lib-report-type').value;
+            const refDateStr = document.getElementById('lib-report-date').value;
+            if(!refDateStr) return;
+
+            const db = safeParse('sys_library_db', {});
+            let resultData = [0,0,0,0,0,0,0,0];
+            let reportTitle = "";
+            const refDate = new Date(refDateStr);
+
+            if (type === 'daily') {
+                reportTitle = `รายงานสถิติประจำวันที่: ${refDateStr}`;
+                if (db[refDateStr]) resultData = db[refDateStr];
+            } else if (type === 'monthly') {
+                const monthPrefix = refDateStr.substring(0, 7);
+                reportTitle = `รายงานสถิติประจำเดือน: ${monthPrefix}`;
+                for (let key in db) {
+                    if (key.startsWith(monthPrefix)) {
+                        for(let i=0; i<8; i++) resultData[i] += db[key][i];
+                    }
+                }
+            } else if (type === 'weekly') {
+                const day = refDate.getDay();
+                const diffToMonday = refDate.getDate() - day + (day === 0 ? -6 : 1);
+                const monday = new Date(refDate.setDate(diffToMonday));
+                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+                const monStr = monday.toISOString().split('T')[0];
+                const sunStr = sunday.toISOString().split('T')[0];
+                reportTitle = `รายงานสถิติประจำสัปดาห์: ${monStr} ถึง ${sunStr}`;
+                for (let key in db) {
+                    if (key >= monStr && key <= sunStr) {
+                        for(let i=0; i<8; i++) resultData[i] += db[key][i];
+                    }
+                }
+            }
+
+            document.getElementById('lib-report-title').innerText = reportTitle;
+            if(libChart) {
+                libChart.data.datasets[0].data = resultData;
+                libChart.update();
+            }
+
+            const total = resultData.reduce((a, b) => a + b, 0);
+            document.getElementById('lib-total-count').innerText = total.toLocaleString();
+            
+            const tbody = document.getElementById('lib-table-body');
+            tbody.innerHTML = '';
+            resultData.forEach((val, index) => {
+                let percent = total > 0 ? ((val / total) * 100).toFixed(2) : "0.00";
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="p-2.5 font-medium text-gray-700">${libLabels[index]}</td>
+                        <td class="p-2.5 text-center">${val.toLocaleString()}</td>
+                        <td class="p-2.5 text-center text-purple-600 font-bold">${percent} %</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function clearLibDatabase() {
+            if(confirm("คุณต้องการลบข้อมูลสถิติวิทยบริการที่บันทึกไว้ทั้งหมดใช่หรือไม่?")) {
+                localStorage.removeItem('sys_library_db');
+                saveGlobalData('sys_library_db', {});
+                loadLibEntryData(); updateLibReport();
+                document.getElementById('lib-upload-status').classList.add('hidden');
+                showToast("ล้างข้อมูลเรียบร้อยแล้ว");
+            }
+        }
+
+        function cleanLibExcelDate(dateInput) {
+            if (!dateInput) return null;
+            if (!isNaN(dateInput) && Number(dateInput) > 10000) {
+                const excelDate = new Date((Math.floor(Number(dateInput)) - 25569) * 86400 * 1000);
+                return excelDate.toISOString().split('T')[0];
+            }
+            let str = String(dateInput).trim().split(' ')[0];
+            let parts = str.split(/[\/\-]/);
+            if (parts.length === 3) {
+                let day, month, year;
+                if (parts[0].length === 4) { year = parseInt(parts[0]); month = parseInt(parts[1]); day = parseInt(parts[2]); } 
+                else { day = parseInt(parts[0]); month = parseInt(parts[1]); year = parseInt(parts[2]); }
+                if (year > 2400) year -= 543;
+                if (!isNaN(day) && !isNaN(month) && !isNaN(year)) { return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`; }
+            }
+            return null;
+        }
+
+        function setupLibDragAndDrop() {
+            const dropZone = document.getElementById('lib-drop-zone');
+            const fileInput = document.getElementById('lib-excel-file');
+            if(!dropZone) return;
+            dropZone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => handleLibFile(e.target.files[0]));
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-green-200', 'border-green-600'); });
+            ['dragleave', 'dragend'].forEach(type => { dropZone.addEventListener(type, () => dropZone.classList.remove('bg-green-200', 'border-green-600')); });
+            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('bg-green-200', 'border-green-600'); if (e.dataTransfer.files.length) handleLibFile(e.dataTransfer.files[0]); });
+        }
+
+        function handleLibFile(file) {
+            if (!file) return;
+            showLibStatus("กำลังวิเคราะห์และนับข้อมูล...", "bg-yellow-100", "text-yellow-700");
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    if (jsonData.length === 0) { showLibStatus("❌ ไม่พบข้อมูลในไฟล์ Excel", "bg-red-100", "text-red-700"); return; }
+                    processLibExcelData(jsonData);
+                } catch (err) { showLibStatus("❌ ไฟล์เสียหายหรือไม่ถูกต้อง", "bg-red-100", "text-red-700"); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processLibExcelData(data) {
+            const db = safeParse('sys_library_db', {});
+            let successCount = 0; let skipCount = 0; 
+            data.forEach(row => {
+                let fullName = row['ชื่อ-นามสกุล'] || row['ชื่อ'] || "";
+                if (String(fullName).trim() === 'ไม่พบชื่อในฐานข้อมูล') { skipCount++; return; }
+                let dateKeyRaw = row['วัน-เวลา'] || row['วันที่'] || row['date'];
+                let dateKey = cleanLibExcelDate(dateKeyRaw);
+                let majorRaw = row['สาขาวิชา'] || row['สาขา'];
+                
+                if (!dateKey || !majorRaw || String(majorRaw).trim() === "" || String(majorRaw).trim() === "undefined") { skipCount++; return; }
+                let majorStr = String(majorRaw).replace(/\s+/g, '');
+                if (!db[dateKey]) db[dateKey] = [0, 0, 0, 0, 0, 0, 0, 0];
+
+                let matchedIndex = libLabels.findIndex(label => {
+                    let normLabel = label.replace(/\s+/g, '');
+                    return majorStr.includes(normLabel) || normLabel.includes(majorStr);
+                });
+
+                if (matchedIndex !== -1) { db[dateKey][matchedIndex] += 1; successCount++; } 
+                else { skipCount++; }
+            });
+            saveGlobalData('sys_library_db', db);
+            showLibDetailedStatus(successCount, skipCount);
+            loadLibEntryData(); updateLibReport();
+        }
+
+        function showLibDetailedStatus(success, skipped) {
+            const status = document.getElementById('lib-upload-status');
+            status.innerHTML = `<div class="text-green-700 font-bold">✓ ประมวลผลเสร็จสิ้น</div><div class="text-gray-600">📊 นับเข้าสาขาสำเร็จ: <span class="font-bold text-blue-600">${success}</span> คน</div><div class="text-red-600 font-medium">⚠️ ถูกตัดออก: <span class="font-bold">${skipped}</span> รายการ</div>`;
+            status.className = "text-[10px] mt-3 p-2 rounded bg-green-50 border border-green-200 block space-y-1";
+        }
+
+        function showLibStatus(msg, bgColor, textColor) {
+            const status = document.getElementById('lib-upload-status');
+            status.innerText = msg; status.className = `text-[10px] font-semibold mt-3 p-2 rounded ${bgColor} ${textColor} block`;
+        }
+
+        function switchTab(id){
+            document.querySelectorAll('.tab-content').forEach(el=>el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn=>{
+                btn.classList.remove('bg-white','text-indigo-600','shadow-sm','bg-emerald-50','text-emerald-700','border-emerald-200', 'bg-blue-50', 'text-blue-700', 'border-blue-200');
+                btn.classList.add(btn.id==='btn-rooms'?'text-emerald-600':(btn.id==='btn-library'?'text-blue-600':'text-slate-600'));
+            });
+            const btn=document.getElementById('btn-'+id.replace('-tab',''));
+            if(btn){
+                if(id==='rooms-tab'){ btn.classList.add('bg-emerald-50','text-emerald-700','border-emerald-200','shadow-sm');btn.classList.remove('text-emerald-600'); }
+                else if(id==='library-tab'){ btn.classList.add('bg-blue-50','text-blue-700','border-blue-200','shadow-sm');btn.classList.remove('text-blue-600'); }
+                else { btn.classList.add('bg-white','text-indigo-600','shadow-sm');btn.classList.remove('text-slate-600'); }
+            }
+            const mSection=document.querySelector('.hidden-in-home');
+            if(mSection){
+                if(id==='home-tab'||id==='group-tab'||id==='rooms-tab'||id==='library-tab') mSection.classList.add('hidden');
+                else mSection.classList.remove('hidden');
+            }
+            if(id==='home-tab')updateDash();
+            if(id==='students-tab')renderStudentList();
+            if(id==='attendance-tab')loadAttendance();
+            if(id==='score-tab')renderScoreTable();
+            if(id==='report-tab')generateReport();
+            if(id==='grade-tab')calculateGrades();
+            if(id==='rooms-tab'){if(!currentRoomId&&rooms.length===0)setTimeout(createRoom,300);else updateRoomDropdown();}
+            
+            if(id==='library-tab') {
+                if(!libChart) { setTimeout(initLibChart, 100); }
+                loadLibEntryData(); updateLibReport();
+            }
+        }
         
         function sortStudents(){if(students.length===0)return;students.sort((a,b)=>{let nA=a.id.replace(/\D/g,''),nB=b.id.replace(/\D/g,'');return nA.length!==nB.length?nA.length-nB.length:nA.localeCompare(nB)||a.id.localeCompare(b.id,'th');});saveData('students',students);loadDataForCurrentCourse();showToast("จัดเรียงสำเร็จ!");}
         function addStudentManual(){const id=prompt("รหัส:");if(!id||!id.trim())return;if(students.find(s=>s.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อ:");if(!nm||!nm.trim())return;students.push({id:id.trim(),name:nm.trim()});saveData('students',students);loadDataForCurrentCourse();showToast("เพิ่มสำเร็จ");}
@@ -508,12 +858,11 @@
         function updateFinalScore(sid,v){if(v==='')delete finalScores[sid];else finalScores[sid]=parseFloat(v);saveData('final_scores',finalScores);calculateGrades();}
         function calculateGrades(){const b=document.getElementById('grade-list');b.innerHTML='';if(!students.length){document.getElementById('grade-summary').innerHTML='';return b.innerHTML='<tr><td colspan="4" class="text-center p-10 text-slate-400">ไม่มีรายชื่อ</td></tr>';}let sm={'4':0,'3.5':0,'3':0,'2.5':0,'2':0,'1.5':0,'1':0,'0':0},ad=sessionStorage.getItem('user_role')==='admin';students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; let ct=0;tasks.forEach(t=>{let sc=(scores[s.id]&&scores[s.id][t.id]!==undefined)?scores[s.id][t.id]:'';if(sc!=='')ct+=parseFloat(sc);});ct=Math.round(ct*100)/100;let ov=finalScores[s.id]!==undefined,ts=ov?finalScores[s.id]:ct,g='0';if(ts>=80)g='4';else if(ts>=75)g='3.5';else if(ts>=70)g='3';else if(ts>=65)g='2.5';else if(ts>=60)g='2';else if(ts>=55)g='1.5';else if(ts>=50)g='1';sm[g]++;const inp=ad?`<input type="number" class="w-16 text-center border rounded py-1 text-xs font-bold outline-none ${ov?'text-indigo-700 bg-indigo-50 border-indigo-200 shadow-inner':'text-slate-700'}" placeholder="${ct}" value="${ov?ts:''}" onchange="updateFinalScore('${s.id}',this.value)">`:`<span class="font-bold text-slate-700 text-xs">${ts}</span>`;const tr=document.createElement('tr');tr.innerHTML=`<td class="p-3 pl-5 text-slate-500 text-[10px]">${s.id}</td><td class="p-3 font-medium text-xs">${sName}</td><td class="p-3 text-center">${inp}</td><td class="p-3 text-center font-bold text-sm ${g==='0'?'text-rose-600':'text-indigo-600'}">${g}</td>`;b.appendChild(tr);});document.getElementById('grade-summary').innerHTML=`<div class="flex flex-wrap gap-2 justify-center">`+Object.keys(sm).reverse().map(x=>`<span class="bg-slate-100 px-2.5 py-1 rounded-lg text-[10px] font-bold border">เกรด ${x} : ${sm[x]} คน</span>`).join('')+`</div>`;}
         
-        // 🌟 แก้ไขระบบเพิ่มลายเซ็นครู 🌟
         function exportGradesToExcel(){if(!students.length)return;let d=[["รหัส","ชื่อ","คะแนนรวม","เกรด"]];students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; let ct=0;tasks.forEach(t=>{let sc=(scores[s.id]&&scores[s.id][t.id]!==undefined)?scores[s.id][t.id]:'';if(sc!=='')ct+=parseFloat(sc);});let ts=finalScores[s.id]!==undefined?finalScores[s.id]:Math.round(ct*100)/100;let g='0';if(ts>=80)g='4';else if(ts>=75)g='3.5';else if(ts>=70)g='3';else if(ts>=65)g='2.5';else if(ts>=60)g='2';else if(ts>=55)g='1.5';else if(ts>=50)g='1';d.push([s.id,sName,ts,g]);});d.push([]);d.push(["","","ลงชื่อผู้สอน: ",teacherName]);let ws=XLSX.utils.aoa_to_sheet(d),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Grades");XLSX.writeFile(wb,`เกรด_${courses.find(c=>c.id===currentCourseId)?.name||''}.xlsx`);showToast('โหลด Excel สำเร็จ');}
-        function exportGradesToPDF(){if(!students.length)return;const cn=courses.find(c=>c.id===currentCourseId)?.name||'';const p=document.createElement('div');p.style="padding:30px;font-family:'Kanit',sans-serif;";let h=`<h2 style="text-align:center;">รายงานตัดเกรด</h2><p style="text-align:center;">วิชา: ${cn}</p><table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:20px;"><thead><tr style="background:#f3f4f6;"><th style="border:1px solid #ddd;padding:8px;">รหัส</th><th style="border:1px solid #ddd;padding:8px;">ชื่อ</th><th style="border:1px solid #ddd;padding:8px;text-align:center;">คะแนน</th><th style="border:1px solid #ddd;padding:8px;text-align:center;">เกรด</th></tr></thead><tbody>`;students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; let ct=0;tasks.forEach(t=>{let sc=(scores[s.id]&&scores[s.id][t.id]!==undefined)?scores[s.id][t.id]:'';if(sc!=='')ct+=parseFloat(sc);});let ts=finalScores[s.id]!==undefined?finalScores[s.id]:Math.round(ct*100)/100;let g='0';if(ts>=80)g='4';else if(ts>=75)g='3.5';else if(ts>=70)g='3';else if(ts>=65)g='2.5';else if(ts>=60)g='2';else if(ts>=55)g='1.5';else if(ts>=50)g='1';h+=`<tr><td style="border:1px solid #ddd;padding:8px;">${s.id}</td><td style="border:1px solid #ddd;padding:8px;">${sName}</td><td style="border:1px solid #ddd;padding:8px;text-align:center;">${ts}</td><td style="border:1px solid #ddd;padding:8px;text-align:center;font-weight:bold;">${g}</td></tr>`;});h+=`</tbody></table>`;h+=`<div style="margin-top:40px;text-align:right;font-size:12px;"><p>ลงชื่อ...........................................................</p><p style="margin-top:10px;">( ${teacherName||'.............................................'} )</p><p style="margin-top:5px;">อาจารย์ผู้สอน/ผู้รายงาน</p></div>`;p.innerHTML=h;showToast('สร้าง PDF...');html2pdf().set({margin:0.5,filename:`เกรด_${cn}.pdf`,jsPDF:{orientation:'portrait'}}).from(p).save().then(()=>showToast('โหลด PDF สำเร็จ'));}
+        function exportGradesToPDF(){if(!students.length)return;const cn=courses.find(c=>c.id===currentCourseId)?.name||'';const p=document.createElement('div');p.style="padding:30px;font-family:'Kanit',sans-serif;";let h=`<h2 style="text-align:center;">รายงานตัดเกรด</h2><p style="text-align:center;">วิชา: ${cn}</p><table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:20px;"><thead><tr style="background:#f3f4f6;"><th style="border:1px solid #ddd;padding:8px;">รหัส</th><th style="border:1px solid #ddd;padding:8px;">ชื่อ</th><th style="border:1px solid #ddd;padding:8px;text-align:center;">คะแนน</th><th style="border:1px solid #ddd;padding:8px;text-align:center;">เกรด</th></tr></thead><tbody>`;students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; let ct=0;tasks.forEach(t=>{let sc=(scores[s.id]&&scores[s.id][t.id]!==undefined)?scores[s.id][t.id]:'';if(sc!=='')ct+=parseFloat(sc);});let ts=finalScores[s.id]!==undefined?finalScores[s.id]:Math.round(ct*100)/100;let g='0';if(ts>=80)g='4';else if(ts>=75)g='3.5';else if(ts>=70)g='3';else if(ts>=65)g='2.5';else if(ts>=60)g='2';else if(ts>=55)g='1.5';else if(ts>=50)g='1';h+=`<tr><td style="border:1px solid #ddd;padding:8px;">${s.id}</td><td style="border:1px solid #ddd;padding:8px;">${sName}</td><td style="border:1px solid #ddd;padding:8px;text-align:center;">${ts}</td><td style="border:1px solid #ddd;padding:8px;text-align:center;font-weight:bold;">${g}</td></tr>`;});h+=`</tbody></table>`;h+=`<div style="margin-top:40px;text-align:right;font-size:12px;"><p>ลงชื่อ...........................................................</p><p style="margin-top:10px;">( ${teacherName||'.............................................'} )</p><p style="margin-top:5px;">อาจารย์ผู้สอน</p></div>`;p.innerHTML=h;showToast('สร้าง PDF...');html2pdf().set({margin:0.5,filename:`เกรด_${cn}.pdf`,jsPDF:{orientation:'portrait'}}).from(p).save().then(()=>showToast('โหลด PDF สำเร็จ'));}
         function generateReport(){const ft=document.getElementById('report-filter').value,dt=document.getElementById('report-date').value,tb=document.getElementById('report-list'),th=document.getElementById('report-table-header');tb.innerHTML='';let fd=Object.keys(attendanceData||{}),rt="รายงานสรุป",td=new Date();td.setHours(0,0,0,0);if(ft==='daily'){const dtu=dt||`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;fd=fd.filter(d=>d===dtu);rt=`รายวัน`;}else if(ft==='weekly'){const lw=new Date(td);lw.setDate(td.getDate()-7);fd=fd.filter(d=>new Date(d)>=lw&&new Date(d)<=td);rt="7 วันล่าสุด";}else if(ft==='monthly'){fd=fd.filter(d=>new Date(d).getMonth()===td.getMonth()&&new Date(d).getFullYear()===td.getFullYear());rt="รายเดือน";}document.getElementById('report-title-display').textContent=rt;let hh=`<tr><th class="p-3 w-48">ชื่อ-นามสกุล</th><th class="p-3 text-center">มา</th><th class="p-3 text-center">ขาด</th><th class="p-3 text-center">สาย</th><th class="p-3 text-center text-purple-600">ลา</th>`;tasks.forEach(t=>{hh+=`<th class="p-3 text-center border-l text-[10px] min-w-[60px]">${t.name}</th>`;});hh+=`<th class="p-3 text-right border-l text-indigo-600">คะแนนรวม</th></tr>`;th.innerHTML=hh;let o={'present':0,'absent':0,'late':0,'leave':0};if(!students.length)tb.innerHTML='<tr><td colspan="100%" class="p-10 text-center text-slate-400">ไม่มีข้อมูล</td></tr>';students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; let ss={'present':0,'absent':0,'late':0,'leave':0};fd.forEach(d=>{if(attendanceData[d]&&attendanceData[d][s.id]){ss[attendanceData[d][s.id]]++;o[attendanceData[d][s.id]]++;}});let rh=`<tr><td class="p-3"><div class="text-xs font-medium">${sName}</div><div class="text-[10px] text-slate-400">${s.id}</div></td><td class="p-3 text-center text-emerald-600">${ss.present}</td><td class="p-3 text-center text-rose-500">${ss.absent}</td><td class="p-3 text-center text-amber-500">${ss.late}</td><td class="p-3 text-center text-purple-500">${ss.leave}</td>`;let ct=0;tasks.forEach(t=>{let sc=(scores[s.id]&&scores[s.id][t.id]!==undefined)?scores[s.id][t.id]:'';if(sc!=='')ct+=parseFloat(sc);rh+=`<td class="p-3 text-center border-l text-xs">${sc===''?'':sc}</td>`;});rh+=`<td class="p-3 text-right font-bold text-indigo-600 border-l text-xs">${Math.round(ct*100)/100}</td></tr>`;tb.innerHTML+=rh;});document.getElementById('report-summary-cards').innerHTML=`<div class="bg-white p-3 rounded-xl border text-center"><p class="text-[10px] font-bold text-slate-500">นร. ทั้งหมด</p><p class="text-lg font-bold">${students.length}</p></div><div class="bg-emerald-50 p-3 rounded-xl border text-center"><p class="text-[10px] font-bold text-emerald-600">มาสะสม</p><p class="text-lg font-bold text-emerald-700">${o.present}</p></div><div class="bg-rose-50 p-3 rounded-xl border text-center"><p class="text-[10px] font-bold text-rose-600">ขาดสะสม</p><p class="text-lg font-bold text-rose-700">${o.absent}</p></div><div class="bg-amber-50 p-3 rounded-xl border text-center"><p class="text-[10px] font-bold text-amber-600">สายสะสม</p><p class="text-lg font-bold text-amber-700">${o.late}</p></div><div class="bg-purple-50 p-3 rounded-xl border text-center"><p class="text-[10px] font-bold text-purple-600">ลาสะสม</p><p class="text-lg font-bold text-purple-700">${o.leave}</p></div>`;}
         function exportToExcel(){if(!students.length)return;let ws=XLSX.utils.table_to_book(document.getElementById('report-table'),{sheet:"Report"});XLSX.utils.sheet_add_aoa(ws,[[],["ลงชื่อผู้สอน: ",teacherName]],{origin:-1});XLSX.writeFile(ws,`รายงาน_${courses.find(c=>c.id===currentCourseId)?.name||''}.xlsx`);}
-        function exportToPDF(){if(!students.length)return;const cn=courses.find(c=>c.id===currentCourseId)?.name||'';const p=document.createElement('div');p.style="padding:20px;font-family:'Kanit',sans-serif;";let h=`<h2 style="text-align:center;">รายงานสรุป</h2><p style="text-align:center;">วิชา: ${cn}</p><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="background:#f3f4f6;"><th style="border:1px solid #ddd;padding:6px;">รหัส/ชื่อ</th><th style="border:1px solid #ddd;padding:6px;">มา</th><th style="border:1px solid #ddd;padding:6px;">ขาด</th><th style="border:1px solid #ddd;padding:6px;">สาย</th><th style="border:1px solid #ddd;padding:6px;">ลา</th>`;tasks.forEach(t=>{h+=`<th style="border:1px solid #ddd;padding:6px;">${t.name}</th>`;});h+=`<th style="border:1px solid #ddd;padding:6px;">รวม</th></tr></thead><tbody>`;const rs=document.getElementById('report-list').children;for(let r of rs){if(r.children.length>1){h+=`<tr><td style="border:1px solid #ddd;padding:6px;">${r.children[0].innerText.replace(/\n/g,' ')}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[1].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[2].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[3].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[4].innerText}</td>`;for(let i=0;i<tasks.length;i++)h+=`<td style="border:1px solid #ddd;padding:6px;">${r.children[5+i].innerText}</td>`;h+=`<td style="border:1px solid #ddd;padding:6px;font-weight:bold;">${r.children[5+tasks.length].innerText}</td></tr>`;}}h+=`</tbody></table>`;h+=`<div style="margin-top:30px;text-align:right;font-size:10px;"><p>ลงชื่อ...........................................................</p><p style="margin-top:10px;">( ${teacherName||'.............................................'} )</p><p style="margin-top:5px;">อาจารย์ผู้สอน/ผู้รายงาน</p></div>`;p.innerHTML=h;html2pdf().set({margin:0.5,filename:`รายงาน_${cn}.pdf`,jsPDF:{orientation:'landscape'}}).from(p).save();}
+        function exportToPDF(){if(!students.length)return;const cn=courses.find(c=>c.id===currentCourseId)?.name||'';const p=document.createElement('div');p.style="padding:20px;font-family:'Kanit',sans-serif;";let h=`<h2 style="text-align:center;">รายงานสรุป</h2><p style="text-align:center;">วิชา: ${cn}</p><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="background:#f3f4f6;"><th style="border:1px solid #ddd;padding:6px;">รหัส/ชื่อ</th><th style="border:1px solid #ddd;padding:6px;">มา</th><th style="border:1px solid #ddd;padding:6px;">ขาด</th><th style="border:1px solid #ddd;padding:6px;">สาย</th><th style="border:1px solid #ddd;padding:6px;">ลา</th>`;tasks.forEach(t=>{h+=`<th style="border:1px solid #ddd;padding:6px;">${t.name}</th>`;});h+=`<th style="border:1px solid #ddd;padding:6px;">รวม</th></tr></thead><tbody>`;const rs=document.getElementById('report-list').children;for(let r of rs){if(r.children.length>1){h+=`<tr><td style="border:1px solid #ddd;padding:6px;">${r.children[0].innerText.replace(/\n/g,' ')}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[1].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[2].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[3].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[4].innerText}</td>`;for(let i=0;i<tasks.length;i++)h+=`<td style="border:1px solid #ddd;padding:6px;">${r.children[5+i].innerText}</td>`;h+=`<td style="border:1px solid #ddd;padding:6px;font-weight:bold;">${r.children[5+tasks.length].innerText}</td></tr>`;}}h+=`</tbody></table>`;h+=`<div style="margin-top:30px;text-align:right;font-size:10px;"><p>ลงชื่อ...........................................................</p><p style="margin-top:10px;">( ${teacherName||'.............................................'} )</p><p style="margin-top:5px;">อาจารย์ผู้สอน</p></div>`;p.innerHTML=h;html2pdf().set({margin:0.5,filename:`รายงาน_${cn}.pdf`,jsPDF:{orientation:'landscape'}}).from(p).save();}
         
         async function procImg(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("AI อ่านภาพ...","รอสักครู่","📸");try{const res=await Tesseract.recognize(f,'tha+eng');const ls=res.data.text.split('\n');let ps=[];ls.forEach(l=>{const m=l.match(/\b\d{10,13}\b/);if(m){let nm=l.substring(l.indexOf(m[0])+m[0].length).replace(/^[^\u0E00-\u0E7Fa-zA-Z]+/,'').replace(/[\d\.\,\-_]/g,"").trim();if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`สแกนได้ ${ps.length} คน`);}else showToast("ไม่พบรายชื่อ",true);}catch(e){showToast("Error",true);}finally{hideLoader();e.target.value='';}}
         async function procFile(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("อ่านไฟล์...","รอสักครู่");if(f.name.toLowerCase().endsWith('.pdf')){try{const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/cmaps/',cMapPacked:true}).promise;let ri=[];for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const tc=await p.getTextContent();tc.items.forEach(it=>ri.push({text:it.str.trim(),x:it.transform[4],y:it.transform[5]}));}let rm={};ri.forEach(it=>{if(it.text==="")return;let k=Math.round(it.y/3)*3;if(!rm[k])rm[k]=[];rm[k].push(it);});let ps=[];Object.keys(rm).sort((a,b)=>b-a).forEach(yk=>{let txt=rm[yk].sort((a,b)=>a.x-b.x).map(i=>i.text).join(" ");let m=txt.match(/\b\d{11}\b/);if(m){let nm=txt.substring(txt.indexOf(m[0])+m[0].length).trim().replace(/[\d\.\,\-]/g,"").trim();if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length===0){let ft=ri.map(i=>i.text).join(" ");const rx=/(68\d{9})\s+([ก-๙\s]+?)(?=(?:68\d{9})|รวมจำนวน|$)/g;let mm;while((mm=rx.exec(ft))!==null){let nm=mm[2].replace(/\s+/g,' ').trim();if(nm.length>4)ps.push({id:mm[1],name:nm});}}if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`ดึง PDF สำเร็จ ${ps.length} คน`);}else showToast("อ่าน PDF ไม่ได้",true);}catch(e){showToast("Error",true);}finally{hideLoader();}}else{const r=new FileReader();r.onload=(ev)=>{const wb=XLSX.read(ev.target.result,{type:'binary'});const js=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);let ps=[];js.forEach(rw=>{let idK=Object.keys(rw).find(k=>k.toLowerCase().includes('id')||k.includes('รหัส'));let nmK=Object.keys(rw).find(k=>k.toLowerCase().includes('name')||k.includes('ชื่อ'));if(idK&&nmK&&rw[idK]&&rw[nmK])ps.push({id:String(rw[idK]).trim(),name:String(rw[nmK]).trim()});});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`Excel สำเร็จ ${ps.length} คน`);}hideLoader();};r.readAsBinaryString(f);}e.target.value='';}
@@ -522,7 +871,6 @@
         function closeCopy(){document.getElementById('copy-modal-content').classList.add('scale-95');setTimeout(()=>document.getElementById('copy-modal').classList.add('hidden'),300);}
         function confirmCopy(){const id=document.getElementById('copy-course-sel').value;let cs=safeParse(`students_${id}`,[]);if(!cs.length)return showToast("วิชานั้นไม่มีรายชื่อ",true);let a=0;cs.forEach(c=>{if(!students.find(s=>s.id===c.id)){students.push(c);a++;}});saveData('students',students);loadDataForCurrentCourse();showToast(`ดึงสำเร็จ ${a} คน`);closeCopy();}
         
-        // 🌟 แก้ไขระบบลิงก์ผูกห้อง Auto-Sync 🌟
         function openPullRoomModal(){if(!currentCourseId)return showToast("สร้างวิชาก่อน",true);if(!rooms.length)return showToast("ยังไม่มีฐานข้อมูลห้อง",true);const s=document.getElementById('pull-room-sel');s.innerHTML='';rooms.forEach(r=>{s.innerHTML+=`<option value="${r.id}">${r.name}</option>`;});document.getElementById('pull-room-modal').classList.remove('hidden');setTimeout(()=>document.getElementById('pull-room-modal-content').classList.remove('scale-95'),10);}
         function closePullRoom(){document.getElementById('pull-room-modal-content').classList.add('scale-95');setTimeout(()=>document.getElementById('pull-room-modal').classList.add('hidden'),300);}
         function confirmPullRoom(){const rid=document.getElementById('pull-room-sel').value; localStorage.setItem('course_link_' + currentCourseId, rid); syncLinkedRoom(); updateLinkedRoomUI(); closePullRoom();}
