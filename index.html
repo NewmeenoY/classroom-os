@@ -73,17 +73,13 @@
                 </div>
                 <div class="flex space-x-1.5 bg-slate-100 p-1 rounded-xl overflow-x-auto w-full md:w-auto justify-start md:justify-center hide-scrollbar">
                     <button onclick="switchTab('home-tab')" id="btn-home" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap">🏠 หน้าหลัก</button>
-                    
                     <button onclick="switchTab('rooms-tab')" id="btn-rooms" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap ml-1 shadow-sm">🗂️ ห้องเรียน</button>
-                    
                     <button onclick="switchTab('library-tab')" id="btn-library" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap ml-1 shadow-sm">🏢 วิทยบริการ</button>
-
                     <button onclick="switchTab('students-tab')" id="btn-students" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">📋 รายชื่อ (ในวิชา)</button>
                     <button onclick="switchTab('attendance-tab')" id="btn-attendance" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">⏰ เช็คชื่อ</button>
                     <button onclick="switchTab('score-tab')" id="btn-score" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">💯 คะแนน</button>
                     <button onclick="switchTab('report-tab')" id="btn-report" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">📊 รายงาน</button>
                     <button onclick="switchTab('grade-tab')" id="btn-grade" class="admin-only tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">🅰️ ตัดเกรด</button>
-                    
                     <button onclick="switchTab('group-tab')" id="btn-group" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition text-slate-600 whitespace-nowrap border border-transparent">👥 จัดกลุ่ม</button>
                     <button onclick="openRandomModal()" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 whitespace-nowrap ml-1 shadow-sm">🎲 สุ่มตอบ</button>
                 </div>
@@ -225,7 +221,7 @@
                                 <tr class="bg-purple-100 font-bold text-purple-800">
                                     <td class="border border-gray-200 p-2.5 text-right">รวมผู้เข้าใช้บริการทั้งหมด</td>
                                     <td id="lib-total-count" class="border border-gray-200 p-2.5 text-center">0</td>
-                                    <td class="border border-gray-200 p-2.5 text-center">100.00 %</td>
+                                    <td id="lib-total-percent" class="border border-gray-200 p-2.5 text-center">100.00 %</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -536,7 +532,6 @@
             if(sessionStorage.getItem('is_logged_in')==='true'){document.getElementById('login-screen').classList.add('hidden');document.getElementById('app-container').classList.remove('hidden');initApp(true);}
             document.querySelectorAll('.teacher-name-input').forEach(el=>el.value=teacherName);
             
-            // 🌟 🌟 ระบบ Auto-Migration ดึงข้อมูลวิทยบริการตัวเก่าเข้าสู่ตัวใหม่ 🌟 🌟
             let oldDb = localStorage.getItem('library_db');
             if(oldDb) {
                 try {
@@ -614,6 +609,7 @@
         function clearRoomStd(){if(confirm("ล้างรายชื่อห้องนี้ทั้งหมด?")){roomStudents=[];saveData('students_room',roomStudents,true);renderRoomStudents();showToast("ล้างสำเร็จ");}}
         function sortRoomStd(){roomStudents.sort((a,b)=>{let nA=a.id.replace(/\D/g,''),nB=b.id.replace(/\D/g,'');return nA.length!==nB.length?nA.length-nB.length:nA.localeCompare(nB)||a.id.localeCompare(b.id,'th');});saveData('students_room',roomStudents,true);renderRoomStudents();showToast("จัดเรียงสำเร็จ!");}
 
+        /* --- 🌟 ฟังก์ชันระบบห้องวิทยบริการ (Library System) 🌟 --- */
         function initLibChart() {
             const ctx = document.getElementById('lib-major-chart').getContext('2d');
             libChart = new Chart(ctx, {
