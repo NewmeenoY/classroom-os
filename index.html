@@ -12,8 +12,6 @@
     <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- 🌟 เพิ่ม html2canvas สำหรับแคปหน้าจอ 🌟 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Kanit', sans-serif; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -40,10 +38,10 @@
         </div>
     </div>
 
-    <!-- 🌟 โครงสร้างแอปแบบไม่มี Top Header (Clean Layout) 🌟 -->
+    <!-- 🌟 โครงสร้างแอป -->
     <div id="app-container" class="hidden flex-col lg:flex-row h-screen w-full bg-slate-50 overflow-hidden font-sans">
         
-        <!-- แถบนำทางด้านซ้าย (Left Sidebar / Mobile Top Navigation) -->
+        <!-- แถบนำทางด้านซ้าย -->
         <nav class="bg-white border-b lg:border-b-0 lg:border-r border-slate-200 w-full lg:w-64 flex-none z-40 flex flex-col shadow-sm lg:shadow-none">
             <!-- Logo Area -->
             <div class="p-4 md:p-5 flex justify-between items-center lg:block border-b border-slate-100 bg-white">
@@ -56,7 +54,6 @@
                 </div>
             </div>
             
-            <!-- 🌟 ส่วนเลือกวิชาและสถานะคลาวด์ 🌟 -->
             <div class="px-4 py-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row lg:flex-col gap-3 justify-between items-start sm:items-center lg:items-start">
                 <div class="w-full sm:flex-1 lg:w-full">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">📚 วิชาที่กำลังจัดการ</label>
@@ -70,7 +67,7 @@
                 </div>
             </div>
             
-            <!-- เมนูนำทาง (Navigation Buttons) -->
+            <!-- เมนูนำทาง -->
             <div class="flex-1 overflow-x-auto lg:overflow-y-auto hide-scrollbar p-2 lg:p-4 flex flex-row lg:flex-col gap-1 md:gap-1.5">
                 <button onclick="switchTab('home-tab')" id="btn-home" class="tab-btn active text-slate-500 flex items-center gap-3 px-4 py-3 rounded-xl whitespace-nowrap lg:whitespace-normal transition-all duration-200 hover:bg-slate-50 hover:text-slate-700 w-full text-left">
                     <span class="text-xl opacity-80">🏠</span><span class="text-sm font-medium">หน้าหลัก (Dashboard)</span>
@@ -111,15 +108,12 @@
             </div>
         </nav>
 
-        <!-- พื้นที่แสดงผลหลัก (Main Content Area) -->
+        <!-- พื้นที่แสดงผลหลัก -->
         <div class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50">
-            
             <main id="main-content" class="flex-1 overflow-y-auto p-4 md:p-8 pb-20">
                 
-                <!-- 🌟 TAB: หน้าแดชบอร์ด (Control Panel) 🌟 -->
+                <!-- 🌟 TAB: หน้าแดชบอร์ด -->
                 <section id="home-tab" class="tab-content max-w-6xl mx-auto">
-                    
-                    <!-- Hero Banner (Glassmorphism) -->
                     <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-[2rem] p-6 md:p-10 shadow-2xl shadow-indigo-200 text-white relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-8 border border-white/10 animate-pop mb-8">
                         <div class="absolute -right-10 -top-10 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
                         <div class="absolute left-10 -bottom-10 w-48 h-48 bg-blue-400/20 rounded-full blur-2xl pointer-events-none"></div>
@@ -142,7 +136,6 @@
                         </div>
                     </div>
 
-                    <!-- Stats Overview -->
                     <div class="grid grid-cols-2 gap-4 md:gap-6 admin-only mb-8">
                         <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 flex items-center gap-4 hover:-translate-y-1">
                             <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-xl md:text-2xl shadow-inner">📚</div>
@@ -160,7 +153,6 @@
                         </div>
                     </div>
 
-                    <!-- 🌟 ส่วนที่ 1: การตั้งค่าระบบ 🌟 -->
                     <div class="mb-8">
                         <h3 class="text-base md:text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">
                             <span class="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-inner">⚙️</span> การตั้งค่าระบบ
@@ -193,7 +185,6 @@
                         </div>
                     </div>
 
-                    <!-- 🌟 ส่วนที่ 2: เครื่องมือการใช้งาน 🌟 -->
                     <div>
                         <h3 class="text-base md:text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">
                             <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-inner">✨</span> เมนูการจัดการชั้นเรียน
@@ -274,15 +265,8 @@
                         </div>
                     </div>
 
-                    <!-- 🌟 ส่วนกราฟพร้อมแคปหน้าจอ 🌟 -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 relative">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-2 mb-4 gap-2">
-                            <h2 class="text-lg font-bold text-purple-700 flex items-center">📊 รายงานผลและการคำนวณร้อยละ</h2>
-                            <button onclick="captureLibReport()" class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-md hover:bg-indigo-200 font-bold transition text-xs shadow-sm flex items-center gap-1">
-                                📸 เซฟเป็นรูปภาพ
-                            </button>
-                        </div>
-                        
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h2 class="text-lg font-bold text-purple-700 mb-4 flex items-center border-b pb-2">📊 รายงานผลและการคำนวณร้อยละ</h2>
                         <div class="flex flex-col md:flex-row gap-3 mb-5 bg-purple-50 p-3 rounded-lg items-center text-xs">
                             <div class="flex items-center gap-2">
                                 <label class="font-semibold text-gray-700">รูปแบบสรุป:</label>
@@ -299,30 +283,23 @@
                             <button onclick="clearLibDatabase()" class="ml-auto bg-red-100 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-200 font-semibold transition">🗑️ ล้างข้อมูลระบบทั้งหมด</button>
                         </div>
 
-                        <!-- พื้นที่สำหรับ Capture ภาพ -->
-                        <div id="lib-capture-area" class="bg-white p-4 rounded-xl border border-transparent transition-all">
-                            <div class="mb-4"><h3 id="lib-report-title" class="text-sm font-bold text-gray-800 text-center bg-gray-50 py-2 rounded">กำลังประมวลผล...</h3></div>
-                            <div class="mt-4 bg-white"><canvas id="lib-major-chart" height="90"></canvas></div>
+                        <div class="mb-4"><h3 id="lib-report-title" class="text-sm font-bold text-gray-800 text-center bg-gray-50 py-2 rounded">กำลังประมวลผล...</h3></div>
+                        <div class="mt-4"><canvas id="lib-major-chart" height="90"></canvas></div>
 
-                            <div class="mt-6 overflow-x-auto">
-                                <table class="w-full text-left border-collapse border border-gray-200 text-xs">
-                                    <thead>
-                                        <tr class="bg-gray-100 text-gray-700">
-                                            <th class="border border-gray-200 p-2.5 font-semibold">สาขาวิชา</th>
-                                            <th class="border border-gray-200 p-2.5 font-semibold text-center">จำนวน (คน)</th>
-                                            <th class="border border-gray-200 p-2.5 font-semibold text-center">คิดเป็นร้อยละ (%)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="lib-table-body" class="divide-y divide-gray-200"></tbody>
-                                    <tfoot>
-                                        <tr class="bg-purple-100 font-bold text-purple-800">
-                                            <td class="border border-gray-200 p-2.5 text-right">รวมผู้เข้าใช้บริการทั้งหมด</td>
-                                            <td id="lib-total-count" class="border border-gray-200 p-2.5 text-center">0</td>
-                                            <td id="lib-total-percent" class="border border-gray-200 p-2.5 text-center">100.00 %</td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
+                        <div class="mt-6 overflow-x-auto">
+                            <table class="w-full text-left border-collapse border border-gray-200 text-xs">
+                                <thead>
+                                    <tr class="bg-gray-100 text-gray-700"><th class="border border-gray-200 p-2.5 font-semibold">สาขาวิชา</th><th class="border border-gray-200 p-2.5 font-semibold text-center">จำนวน (คน)</th><th class="border border-gray-200 p-2.5 font-semibold text-center">คิดเป็นร้อยละ (%)</th></tr>
+                                </thead>
+                                <tbody id="lib-table-body" class="divide-y divide-gray-200"></tbody>
+                                <tfoot>
+                                    <tr class="bg-purple-100 font-bold text-purple-800">
+                                        <td class="border border-gray-200 p-2.5 text-right">รวมผู้เข้าใช้บริการทั้งหมด</td>
+                                        <td id="lib-total-count" class="border border-gray-200 p-2.5 text-center">0</td>
+                                        <td id="lib-total-percent" class="border border-gray-200 p-2.5 text-center">100.00 %</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -607,8 +584,21 @@
         <p id="loader-desc" class="text-slate-500 text-sm mt-1 font-medium">รอสักครู่</p>
     </div>
 
-    <!-- Script Logic (Minified and Fortified) -->
+    <!-- Script Logic -->
     <script>
+        // 🌟 1. ฟังก์ชันตัวกรองคำขยะ (Smart Text Cleaner) 🌟
+        function cleanThaiName(str) {
+            if (!str) return "";
+            return String(str)
+                // 1. ลบอักขระขยะ (กล่องสี่เหลี่ยม , ช่องว่างล่องหน, อักขระซ่อน)
+                .replace(/[\uFFFD\u200B-\u200D\uFEFF\u0000-\u001F\u007F-\u009F]/g, '')
+                // 2. อนุญาตให้มีแค่ ไทย, อังกฤษ, ตัวเลข, สเปซ, จุด, วงเล็บ, ขีด, และ Single Quote
+                .replace(/[^\u0E00-\u0E7Fa-zA-Z0-9\s\.\(\)\-\']/g, '')
+                // 3. ยุบ Space หลายๆ อันให้เหลืออันเดียว
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         const MASTER_PASS="123456";const SCANNER_PASS="0000";const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzvJEiAD_EDaGmonzW9ucXdsQhhhP1NcCUP0z2oQx-2s-Apws_nQCV4MxuagjVQLlCJ/exec';
         const aCtx=new(window.AudioContext||window.webkitAudioContext)();
         function pS(f,t,d,v=0.1,ty='sine'){if(aCtx.state==='suspended')aCtx.resume();let o=aCtx.createOscillator(),g=aCtx.createGain(),s=aCtx.currentTime+t;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(0.01,s+d);o.connect(g);g.connect(aCtx.destination);o.start(s);o.stop(s+d);}
@@ -635,7 +625,6 @@
         function saveData(k,d,isR=false){let id=isR?currentRoomId:currentCourseId; if(!id)return; hasUnsavedChanges=true; updateSyncUI('pending'); localStorage.setItem(`${k}_${id}`,JSON.stringify(d)); saveToCloud(`${k}_${id}`,d); updateDash();}
         function saveGlobalData(k,d){hasUnsavedChanges=true; updateSyncUI('pending'); localStorage.setItem(k,JSON.stringify(d)); saveToCloud(k,d); updateDash();}
         
-        // 🌟 อัปเดตข้อมูลบนหน้าแดชบอร์ด 🌟
         function updateDash(){
             if(document.getElementById('dash-course-name')&&courses.length>0) document.getElementById('dash-course-name').textContent=(courses.find(c=>c.id===currentCourseId)||{}).name||'-';
             if(document.getElementById('dash-student-count')) document.getElementById('dash-student-count').textContent=(students?students.length:0);
@@ -690,6 +679,15 @@
 
         function loadDataForCurrentCourse(){
             students=safeParse(`students_${currentCourseId}`,[]);
+            
+            // 🌟 ซ่อมแซมและล้างขยะข้อมูลเก่าในรายวิชา (Self-Healing) 🌟
+            let isCleaned = false;
+            students.forEach(s => {
+                let cln = cleanThaiName(s.name);
+                if(s.name !== cln) { s.name = cln; isCleaned = true; }
+            });
+            if(isCleaned) saveData('students', students);
+
             syncLinkedRoom(); 
             updateLinkedRoomUI(); 
             attendanceData=safeParse(`attendance_${currentCourseId}`,{});tasks=safeParse(`tasks_${currentCourseId}`,[]);scores=safeParse(`scores_${currentCourseId}`,{});remarksData=safeParse(`remarks_${currentCourseId}`,{});finalScores=safeParse(`final_scores_${currentCourseId}`,{});rndW=safeParse(`rndW_${currentCourseId}`,{});
@@ -697,19 +695,31 @@
         }
         
         function updateRoomDropdown(){const sel=document.getElementById('room-selector');if(!sel)return;sel.innerHTML='';rooms.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.name;if(r.id===currentRoomId)o.selected=true;sel.appendChild(o);});}
-        function createRoom(){const n=prompt("ชื่อห้องเรียน (เช่น ปวช 1/1):");if(n&&n.trim()){rooms.push({id:'room_'+Date.now(),name:n.trim()});saveGlobalData('sys_rooms',rooms);currentRoomId=rooms[rooms.length-1].id;localStorage.setItem('sys_activeRoom',currentRoomId);updateRoomDropdown();loadRoomStudents();showToast('สร้างห้องสำเร็จ');}}
-        function editRoomName(){const i=rooms.findIndex(r=>r.id===currentRoomId);if(i>-1){const n=prompt("แก้ชื่อห้อง:",rooms[i].name);if(n&&n.trim()&&n.trim()!==rooms[i].name){rooms[i].name=n.trim();saveGlobalData('sys_rooms',rooms);updateRoomDropdown();showToast('แก้ชื่อสำเร็จ');updateLinkedRoomUI();}}}
+        function createRoom(){const n=prompt("ชื่อห้องเรียน (เช่น ปวช 1/1):");if(n&&n.trim()){rooms.push({id:'room_'+Date.now(),name:cleanThaiName(n.trim())});saveGlobalData('sys_rooms',rooms);currentRoomId=rooms[rooms.length-1].id;localStorage.setItem('sys_activeRoom',currentRoomId);updateRoomDropdown();loadRoomStudents();showToast('สร้างห้องสำเร็จ');}}
+        function editRoomName(){const i=rooms.findIndex(r=>r.id===currentRoomId);if(i>-1){const n=prompt("แก้ชื่อห้อง:",rooms[i].name);if(n&&n.trim()&&n.trim()!==rooms[i].name){rooms[i].name=cleanThaiName(n.trim());saveGlobalData('sys_rooms',rooms);updateRoomDropdown();showToast('แก้ชื่อสำเร็จ');updateLinkedRoomUI();}}}
         function deleteRoom(){const i=rooms.findIndex(r=>r.id===currentRoomId);if(i>-1&&confirm(`ลบห้อง "${rooms[i].name}" ถาวร? (ไม่กระทบวิชาที่ดึงไปแล้ว)`)){rooms.splice(i,1);saveGlobalData('sys_rooms',rooms);localStorage.removeItem('students_room_'+currentRoomId);currentRoomId=rooms.length>0?rooms[0].id:null;if(currentRoomId)localStorage.setItem('sys_activeRoom',currentRoomId);else localStorage.removeItem('sys_activeRoom');updateRoomDropdown();loadRoomStudents();showToast('ลบห้องสำเร็จ');}}
         function changeRoom(){currentRoomId=document.getElementById('room-selector').value;localStorage.setItem('sys_activeRoom',currentRoomId);loadRoomStudents();}
-        function loadRoomStudents(){roomStudents=safeParse(`students_room_${currentRoomId}`,[]);renderRoomStudents();}
+        
+        function loadRoomStudents(){
+            roomStudents=safeParse(`students_room_${currentRoomId}`,[]);
+            // 🌟 ซ่อมแซมและล้างขยะข้อมูลเก่าในห้องเรียน (Self-Healing) 🌟
+            let isCleaned = false;
+            roomStudents.forEach(s => {
+                let cln = cleanThaiName(s.name);
+                if(s.name !== cln) { s.name = cln; isCleaned = true; }
+            });
+            if(isCleaned) saveData('students_room', roomStudents, true);
+            renderRoomStudents();
+        }
+        
         function renderRoomStudents(){const tb=document.getElementById('room-student-list');if(!tb)return;tb.innerHTML='';if(!roomStudents.length)return tb.innerHTML='<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อในห้องนี้</td></tr>';roomStudents.forEach(s=>{tb.innerHTML+=`<tr class="hover:bg-slate-50 border-b"><td class="p-2 pl-4 text-slate-500 text-xs">${s.id}</td><td class="p-2 font-medium text-xs text-slate-800">${s.name||s.id||"ไม่มีชื่อ"}</td><td class="p-2 text-center"><button onclick="editRoomStd('${s.id}')" class="bg-amber-50 text-amber-600 px-2 py-1 rounded text-[10px] mr-1">✏️</button><button onclick="delRoomStd('${s.id}')" class="bg-rose-50 text-rose-600 px-2 py-1 rounded text-[10px]">🗑️</button></td></tr>`;});}
-        function addRoomStd(){if(!currentRoomId)return showToast("สร้างห้องก่อน",true);const id=prompt("รหัส:");if(!id||!id.trim())return;if(roomStudents.find(s=>s.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อ:");if(!nm||!nm.trim())return;roomStudents.push({id:id.trim(),name:nm.trim()});saveData('students_room',roomStudents,true);renderRoomStudents();showToast("เพิ่มสำเร็จ");}
-        function editRoomStd(oldId){const s=roomStudents.find(x=>x.id===oldId);if(!s)return;const id=prompt("รหัสใหม่",oldId);if(!id||!id.trim()||(id.trim()!==oldId&&roomStudents.find(x=>x.id===id.trim())))return showToast("รหัสซ้ำ/ว่าง",true);const nm=prompt("ชื่อใหม่",s.name);if(!nm||!nm.trim())return;s.id=id.trim();s.name=nm.trim();saveData('students_room',roomStudents,true);renderRoomStudents();showToast('แก้ไขสำเร็จ');}
+        function addRoomStd(){if(!currentRoomId)return showToast("สร้างห้องก่อน",true);const id=prompt("รหัส:");if(!id||!id.trim())return;if(roomStudents.find(s=>s.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อ:");if(!nm||!nm.trim())return;roomStudents.push({id:id.trim(),name:cleanThaiName(nm.trim())});saveData('students_room',roomStudents,true);renderRoomStudents();showToast("เพิ่มสำเร็จ");}
+        function editRoomStd(oldId){const s=roomStudents.find(x=>x.id===oldId);if(!s)return;const id=prompt("รหัสใหม่",oldId);if(!id||!id.trim()||(id.trim()!==oldId&&roomStudents.find(x=>x.id===id.trim())))return showToast("รหัสซ้ำ/ว่าง",true);const nm=prompt("ชื่อใหม่",s.name);if(!nm||!nm.trim())return;s.id=id.trim();s.name=cleanThaiName(nm.trim());saveData('students_room',roomStudents,true);renderRoomStudents();showToast('แก้ไขสำเร็จ');}
         function delRoomStd(id){const s=roomStudents.find(x=>x.id===id);if(s&&confirm(`ลบ ${s.name||s.id}?`)){roomStudents=roomStudents.filter(x=>x.id!==id);saveData('students_room',roomStudents,true);renderRoomStudents();showToast("ลบสำเร็จ");}}
         function clearRoomStd(){if(confirm("ล้างรายชื่อห้องนี้ทั้งหมด?")){roomStudents=[];saveData('students_room',roomStudents,true);renderRoomStudents();showToast("ล้างสำเร็จ");}}
         function sortRoomStd(){roomStudents.sort((a,b)=>{let nA=a.id.replace(/\D/g,''),nB=b.id.replace(/\D/g,'');return nA.length!==nB.length?nA.length-nB.length:nA.localeCompare(nB)||a.id.localeCompare(b.id,'th');});saveData('students_room',roomStudents,true);renderRoomStudents();showToast("จัดเรียงสำเร็จ!");}
 
-        /* --- 🌟 ฟังก์ชันระบบห้องวิทยบริการ (Library System) แบบ Smart Overwrite 🌟 --- */
+        /* --- 🌟 ฟังก์ชันระบบห้องวิทยบริการ (Library System) 🌟 --- */
         function initLibChart() {
             const ctx = document.getElementById('lib-major-chart').getContext('2d');
             libChart = new Chart(ctx, {
@@ -817,42 +827,6 @@
             }
         }
 
-        /* --- 🌟 ฟังก์ชันแคปหน้าจอระบบวิทยบริการ 🌟 --- */
-        function captureLibReport() {
-            const captureArea = document.getElementById('lib-capture-area');
-            if(!captureArea) return;
-            
-            showLoader("กำลังสร้างไฟล์รูปภาพ...", "กรุณารอสักครู่", "📸");
-            captureArea.classList.add('border-slate-200', 'shadow-sm');
-
-            html2canvas(captureArea, {
-                scale: 2, 
-                backgroundColor: '#ffffff',
-                useCORS: true,
-            }).then(canvas => {
-                captureArea.classList.remove('border-slate-200', 'shadow-sm');
-                const image = canvas.toDataURL("image/png");
-                
-                let reportTitle = document.getElementById('lib-report-title').innerText || "Summary";
-                reportTitle = reportTitle.replace(/[\/\\?%*:|"<>]/g, '-');
-                
-                const link = document.createElement('a');
-                link.href = image;
-                link.download = `รายงานวิทยบริการ_${reportTitle}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                hideLoader();
-                showToast("📸 บันทึกรูปภาพสำเร็จ!");
-            }).catch(err => {
-                captureArea.classList.remove('border-slate-200', 'shadow-sm');
-                hideLoader();
-                showToast("❌ เกิดข้อผิดพลาด ไม่สามารถแคปรูปได้", true);
-                console.error("html2canvas error:", err);
-            });
-        }
-
         function cleanLibExcelDate(dateInput) {
             if (!dateInput) return null;
             if (!isNaN(dateInput) && Number(dateInput) > 10000) {
@@ -941,7 +915,7 @@
             <div class="text-red-600 font-medium">⚠️ ถูกตัดออก (ไม่พบชื่อ): <span class="font-bold">${skipped}</span> รายการ</div>`;
             status.className = "text-[10px] mt-3 p-2 rounded bg-green-50 border border-green-200 block space-y-1";
         }
-        function showLibStatus(msg, bgColor, textColor) { const status = document.getElementById('lib-upload-status'); status.innerText = msg; status.className = `text-[10px] font-semibold mt-3 p-2 rounded ${bgColor} ${textColor} block`; }
+        function showLibStatus(msg, bgColor, textColor) { const status = document.getElementById('lib-upload-status'); status.innerText = msg; status.className = `text-[10px] font-semibold mt-3 p-2 rounded ${bgColor}${textColor} block`; }
 
         // 🌟 แท็บเมนูคอนโทรลสไตล์ Sidebar 🌟
         function switchTab(id){
@@ -975,8 +949,8 @@
         }
         
         function sortStudents(){if(students.length===0)return;students.sort((a,b)=>{let nA=a.id.replace(/\D/g,''),nB=b.id.replace(/\D/g,'');return nA.length!==nB.length?nA.length-nB.length:nA.localeCompare(nB)||a.id.localeCompare(b.id,'th');});saveData('students',students);loadDataForCurrentCourse();showToast("จัดเรียงสำเร็จ!");}
-        function addStudentManual(){const id=prompt("รหัส:");if(!id||!id.trim())return;if(students.find(s=>s.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อ:");if(!nm||!nm.trim())return;students.push({id:id.trim(),name:nm.trim()});saveData('students',students);loadDataForCurrentCourse();showToast("เพิ่มสำเร็จ");}
-        function editStudentData(oldId){const s=students.find(x=>x.id===oldId);if(!s)return;const id=prompt("รหัสใหม่",oldId);if(id===null)return;if(!id.trim())return showToast("ห้ามว่าง",true);if(id.trim()!==oldId&&students.find(x=>x.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อใหม่",s.name);if(nm===null)return;if(!nm.trim())return showToast("ห้ามว่าง",true);s.id=id.trim();s.name=nm.trim();if(s.id!==oldId){for(let d in attendanceData){if(attendanceData[d][oldId]){attendanceData[d][s.id]=attendanceData[d][oldId];delete attendanceData[d][oldId];}}for(let d in remarksData){if(remarksData[d][oldId]){remarksData[d][s.id]=remarksData[d][oldId];delete remarksData[d][oldId];}}if(scores[oldId]){scores[s.id]=scores[oldId];delete scores[oldId];}if(finalScores[oldId]){finalScores[s.id]=finalScores[oldId];delete finalScores[oldId];}if(rndW[oldId]!==undefined){rndW[s.id]=rndW[oldId];delete rndW[oldId];saveData('rndW',rndW);}saveData('attendance',attendanceData);saveData('scores',scores);saveData('remarks',remarksData);saveData('final_scores',finalScores);}saveData('students',students);loadDataForCurrentCourse();showToast('แก้ไขสำเร็จ');}
+        function addStudentManual(){const id=prompt("รหัส:");if(!id||!id.trim())return;if(students.find(s=>s.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อ:");if(!nm||!nm.trim())return;students.push({id:id.trim(),name:cleanThaiName(nm.trim())});saveData('students',students);loadDataForCurrentCourse();showToast("เพิ่มสำเร็จ");}
+        function editStudentData(oldId){const s=students.find(x=>x.id===oldId);if(!s)return;const id=prompt("รหัสใหม่",oldId);if(id===null)return;if(!id.trim())return showToast("ห้ามว่าง",true);if(id.trim()!==oldId&&students.find(x=>x.id===id.trim()))return showToast("รหัสซ้ำ",true);const nm=prompt("ชื่อใหม่",s.name);if(nm===null)return;if(!nm.trim())return showToast("ห้ามว่าง",true);s.id=id.trim();s.name=cleanThaiName(nm.trim());if(s.id!==oldId){for(let d in attendanceData){if(attendanceData[d][oldId]){attendanceData[d][s.id]=attendanceData[d][oldId];delete attendanceData[d][oldId];}}for(let d in remarksData){if(remarksData[d][oldId]){remarksData[d][s.id]=remarksData[d][oldId];delete remarksData[d][oldId];}}if(scores[oldId]){scores[s.id]=scores[oldId];delete scores[oldId];}if(finalScores[oldId]){finalScores[s.id]=finalScores[oldId];delete finalScores[oldId];}if(rndW[oldId]!==undefined){rndW[s.id]=rndW[oldId];delete rndW[oldId];saveData('rndW',rndW);}saveData('attendance',attendanceData);saveData('scores',scores);saveData('remarks',remarksData);saveData('final_scores',finalScores);}saveData('students',students);loadDataForCurrentCourse();showToast('แก้ไขสำเร็จ');}
         function deleteStudent(id){const s=students.find(x=>x.id===id);if(s&&confirm(`ลบ ${s.name||s.id}?`)){students=students.filter(x=>x.id!==id);saveData('students',students);loadDataForCurrentCourse();showToast("ลบสำเร็จ");}}
         function deleteAllStudents(){if(confirm("ลบนักเรียนทั้งหมดในวิชานี้?")){students=[];attendanceData={};scores={};remarksData={};finalScores={};rndW={};saveData('students',students);saveData('attendance',attendanceData);saveData('scores',scores);saveData('remarks',remarksData);saveData('final_scores',finalScores);saveData('rndW',rndW);loadDataForCurrentCourse();showToast("ล้างสำเร็จ");}}
         function renderStudentList(){const tb=document.getElementById('master-student-list');if(!tb)return;tb.innerHTML='';if(!students.length)return tb.innerHTML='<tr><td colspan="3" class="p-10 text-center text-slate-400">ยังไม่มีรายชื่อนักเรียน</td></tr>';students.forEach(s=>{let sName=s.name||s.id||"ไม่มีชื่อ"; tb.innerHTML+=`<tr class="hover:bg-slate-50 transition"><td class="p-3 pl-5 text-slate-500 text-xs">${s.id}</td><td class="p-3 font-medium text-sm text-slate-800">${sName}</td><td class="p-3 text-center"><button onclick="editStudentData('${s.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 px-3 py-1.5 rounded-lg text-xs font-semibold mr-1 transition border border-amber-200 shadow-sm">✏️ แก้ไข</button><button onclick="deleteStudent('${s.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-rose-200 shadow-sm">🗑️ ลบ</button></td></tr>`;});}
@@ -1001,8 +975,9 @@
         function exportToExcel(){if(!students.length)return;let ws=XLSX.utils.table_to_book(document.getElementById('report-table'),{sheet:"Report"});XLSX.utils.sheet_add_aoa(ws,[[],["ลงชื่อผู้สอน: ",teacherName]],{origin:-1});XLSX.writeFile(ws,`รายงาน_${courses.find(c=>c.id===currentCourseId)?.name||''}.xlsx`);}
         function exportToPDF(){if(!students.length)return;const cn=courses.find(c=>c.id===currentCourseId)?.name||'';const p=document.createElement('div');p.style="padding:20px;font-family:'Kanit',sans-serif;";let h=`<h2 style="text-align:center;">รายงานสรุป</h2><p style="text-align:center;">วิชา: ${cn}</p><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="background:#f3f4f6;"><th style="border:1px solid #ddd;padding:6px;">รหัส/ชื่อ</th><th style="border:1px solid #ddd;padding:6px;">มา</th><th style="border:1px solid #ddd;padding:6px;">ขาด</th><th style="border:1px solid #ddd;padding:6px;">สาย</th><th style="border:1px solid #ddd;padding:6px;">ลา</th>`;tasks.forEach(t=>{h+=`<th style="border:1px solid #ddd;padding:6px;">${t.name}</th>`;});h+=`<th style="border:1px solid #ddd;padding:6px;">รวม</th></tr></thead><tbody>`;const rs=document.getElementById('report-list').children;for(let r of rs){if(r.children.length>1){h+=`<tr><td style="border:1px solid #ddd;padding:6px;">${r.children[0].innerText.replace(/\n/g,' ')}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[1].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[2].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[3].innerText}</td><td style="border:1px solid #ddd;padding:6px;">${r.children[4].innerText}</td>`;for(let i=0;i<tasks.length;i++)h+=`<td style="border:1px solid #ddd;padding:6px;">${r.children[5+i].innerText}</td>`;h+=`<td style="border:1px solid #ddd;padding:6px;font-weight:bold;">${r.children[5+tasks.length].innerText}</td></tr>`;}}h+=`</tbody></table>`;h+=`<div style="margin-top:30px;text-align:right;font-size:10px;"><p>ลงชื่อ...........................................................</p><p style="margin-top:10px;">( ${teacherName||'.............................................'} )</p><p style="margin-top:5px;">อาจารย์ผู้สอน</p></div>`;p.innerHTML=h;showToast('สร้าง PDF...');html2pdf().set({margin:0.5,filename:`รายงาน_${cn}.pdf`,jsPDF:{orientation:'landscape'}}).from(p).save();}
         
-        async function procImg(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("AI อ่านภาพ...","รอสักครู่","📸");try{const res=await Tesseract.recognize(f,'tha+eng');const ls=res.data.text.split('\n');let ps=[];ls.forEach(l=>{const m=l.match(/\b\d{10,13}\b/);if(m){let nm=l.substring(l.indexOf(m[0])+m[0].length).replace(/^[^\u0E00-\u0E7Fa-zA-Z]+/,'').replace(/[\d\.\,\-_]/g,"").trim();if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`สแกนได้ ${ps.length} คน`);}else showToast("ไม่พบรายชื่อ",true);}catch(e){showToast("Error",true);}finally{hideLoader();e.target.value='';}}
-        async function procFile(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("อ่านไฟล์...","รอสักครู่");if(f.name.toLowerCase().endsWith('.pdf')){try{const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/cmaps/',cMapPacked:true}).promise;let ri=[];for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const tc=await p.getTextContent();tc.items.forEach(it=>ri.push({text:it.str.trim(),x:it.transform[4],y:it.transform[5]}));}let rm={};ri.forEach(it=>{if(it.text==="")return;let k=Math.round(it.y/3)*3;if(!rm[k])rm[k]=[];rm[k].push(it);});let ps=[];Object.keys(rm).sort((a,b)=>b-a).forEach(yk=>{let txt=rm[yk].sort((a,b)=>a.x-b.x).map(i=>i.text).join(" ");let m=txt.match(/\b\d{11}\b/);if(m){let nm=txt.substring(txt.indexOf(m[0])+m[0].length).trim().replace(/[\d\.\,\-]/g,"").trim();if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length===0){let ft=ri.map(i=>i.text).join(" ");const rx=/(68\d{9})\s+([ก-๙\s]+?)(?=(?:68\d{9})|รวมจำนวน|$)/g;let mm;while((mm=rx.exec(ft))!==null){let nm=mm[2].replace(/\s+/g,' ').trim();if(nm.length>4)ps.push({id:mm[1],name:nm});}}if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`ดึง PDF สำเร็จ ${ps.length} คน`);}else showToast("อ่าน PDF ไม่ได้",true);}catch(e){showToast("Error",true);}finally{hideLoader();}}else{const r=new FileReader();r.onload=(ev)=>{const wb=XLSX.read(ev.target.result,{type:'binary'});const js=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);let ps=[];js.forEach(rw=>{let idK=Object.keys(rw).find(k=>k.toLowerCase().includes('id')||k.includes('รหัส'));let nmK=Object.keys(rw).find(k=>k.toLowerCase().includes('name')||k.includes('ชื่อ'));if(idK&&nmK&&rw[idK]&&rw[nmK])ps.push({id:String(rw[idK]).trim(),name:String(rw[nmK]).trim()});});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`Excel สำเร็จ ${ps.length} คน`);}hideLoader();};r.readAsBinaryString(f);}e.target.value='';}
+        // 🌟 2. ตัวประมวลผลไฟล์และรูป (ใส่ cleanThaiName ให้ทั้งหมดแล้ว) 🌟
+        async function procImg(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("AI อ่านภาพ...","รอสักครู่","📸");try{const res=await Tesseract.recognize(f,'tha+eng');const ls=res.data.text.split('\n');let ps=[];ls.forEach(l=>{const m=l.match(/\b\d{10,13}\b/);if(m){let nm=cleanThaiName(l.substring(l.indexOf(m[0])+m[0].length).replace(/^[^\u0E00-\u0E7Fa-zA-Z]+/,'').replace(/[\d\.\,\-_]/g,""));if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`สแกนได้ ${ps.length} คน`);}else showToast("ไม่พบรายชื่อ",true);}catch(e){showToast("Error",true);}finally{hideLoader();e.target.value='';}}
+        async function procFile(e,isR=false){const f=e.target.files[0];if(!f)return;let id=isR?currentRoomId:currentCourseId;if(!id)return showToast("สร้างห้อง/วิชาก่อน",true);showLoader("อ่านไฟล์...","รอสักครู่");if(f.name.toLowerCase().endsWith('.pdf')){try{const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/cmaps/',cMapPacked:true}).promise;let ri=[];for(let i=1;i<=pdf.numPages;i++){const p=await pdf.getPage(i);const tc=await p.getTextContent();tc.items.forEach(it=>ri.push({text:it.str.trim(),x:it.transform[4],y:it.transform[5]}));}let rm={};ri.forEach(it=>{if(it.text==="")return;let k=Math.round(it.y/3)*3;if(!rm[k])rm[k]=[];rm[k].push(it);});let ps=[];Object.keys(rm).sort((a,b)=>b-a).forEach(yk=>{let txt=rm[yk].sort((a,b)=>a.x-b.x).map(i=>i.text).join(" ");let m=txt.match(/\b\d{11}\b/);if(m){let nm=cleanThaiName(txt.substring(txt.indexOf(m[0])+m[0].length).trim().replace(/[\d\.\,\-]/g,""));if(nm.length>4)ps.push({id:m[0],name:nm});}});if(ps.length===0){let ft=ri.map(i=>i.text).join(" ");const rx=/(68\d{9})\s+([ก-๙\s]+?)(?=(?:68\d{9})|รวมจำนวน|$)/g;let mm;while((mm=rx.exec(ft))!==null){let nm=cleanThaiName(mm[2].replace(/\s+/g,' '));if(nm.length>4)ps.push({id:mm[1],name:nm});}}if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`ดึง PDF สำเร็จ ${ps.length} คน`);}else showToast("อ่าน PDF ไม่ได้",true);}catch(e){showToast("Error",true);}finally{hideLoader();}}else{const r=new FileReader();r.onload=(ev)=>{const wb=XLSX.read(ev.target.result,{type:'binary'});const js=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);let ps=[];js.forEach(rw=>{let idK=Object.keys(rw).find(k=>k.toLowerCase().includes('id')||k.includes('รหัส'));let nmK=Object.keys(rw).find(k=>k.toLowerCase().includes('name')||k.includes('ชื่อ'));if(idK&&nmK&&rw[idK]&&rw[nmK])ps.push({id:String(rw[idK]).trim(),name:cleanThaiName(String(rw[nmK]))});});if(ps.length>0){let tg=isR?roomStudents:students;const um=new Map();tg.forEach(s=>um.set(s.id,s));ps.forEach(s=>um.set(s.id,s));tg=Array.from(um.values());if(isR){roomStudents=tg;saveData('students_room',roomStudents,true);renderRoomStudents();}else{students=tg;saveData('students',students);loadDataForCurrentCourse();}showToast(`Excel สำเร็จ ${ps.length} คน`);}hideLoader();};r.readAsBinaryString(f);}e.target.value='';}
 
         function openCopy(){if(courses.length<2)return showToast("ต้องมีอย่างน้อย 2 วิชา",true);const s=document.getElementById('copy-course-sel');s.innerHTML='';courses.forEach(c=>{if(c.id!==currentCourseId)s.innerHTML+=`<option value="${c.id}">${c.name}</option>`;});document.getElementById('copy-modal').classList.remove('hidden');setTimeout(()=>document.getElementById('copy-modal-content').classList.remove('scale-95'),10);}
         function closeCopy(){document.getElementById('copy-modal-content').classList.add('scale-95');setTimeout(()=>document.getElementById('copy-modal').classList.add('hidden'),300);}
